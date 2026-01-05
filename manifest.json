@@ -1,0 +1,40 @@
+{
+  "manifest_version": 3,
+  "name": "ebird2ornitho",
+  "version": "1.0.0",
+  "description": "Füllt auf Ornitho-Portalen das Template der Beobachtungslisten mit Daten aus eBird",
+
+  "permissions": [
+    "activeTab",
+    "sidePanel",
+    "storage"
+  ],
+
+  "action": {
+    "default_title": "eBird2ornitho"
+  },
+
+  "background": {
+    "service_worker": "background.js"
+  },
+
+  "side_panel": {
+    "default_path": "sidepanel.html"
+  },
+
+  "content_scripts": [
+    {
+      "matches": ["https://*.ebird.org/*"],
+      "js": ["content_ebird.js"]
+    },
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content_ornitho.js"]
+    },
+{
+      "matches": ["<all_urls>"],
+      "js": ["content_species.js"]
+    }
+
+  ]
+}

@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f9f9f9;
+      color: #111;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      padding: 16px;
+      border-bottom: 1px solid #e0e0e0;
+      background: #ffffff;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    header h1 { font-size: 16px; color: #1c7ed6; margin: 0; }
+    #status { font-size: 12px; color: #555; min-height: 16px; }
+
+    main {
+      padding: 16px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    button {
+      border: none;
+      border-radius: 6px;
+      padding: 10px 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.2s;
+      font-size: 14px;
+    }
+
+/* Schlanke Fail-Boxen */
+#failedSpeciesList,
+#failedAtlasList {
+  padding: 8px 10px;
+  gap: 4px;
+  font-size: 12.5px;
+}
+
+#failedSpeciesList strong,
+#failedAtlasList strong {
+  font-size: 12.5px;
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+
+#failedSpeciesItems,
+#failedAtlasItems {
+  line-height: 1.2;      /* enger Zeilenabstand */
+  font-size: 12.5px;
+}
+
+
+    #extractBtn { background-color: #1c7ed6; color: #fff; }
+    #extractBtn:hover { background-color: #1971c2; }
+    #insertBtn { background-color: #2f9e44; color: #fff; }
+    #insertBtn:hover { background-color: #2b8a3e; }
+    #transferSpeciesBtn { background-color: #f59f00; color: #fff; }
+    #transferSpeciesBtn:hover { background-color: #e67700; }
+
+    .data-card {
+      background: #ffffff;
+      border-radius: 10px;
+      padding: 18px 20px;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.08);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .data-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 14px;
+    }
+
+    .label { font-weight: 600; color: #ff7b00; }
+
+    .comment {
+      font-size: 13px;
+      color: #333;
+      background: #f1f5f9;
+      padding: 10px;
+      border-radius: 6px;
+      min-height: 40px;
+      max-height: 40px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      font-style: italic;
+      margin-top: -5px;
+      display: none;
+    }
+
+    .comment.empty { color: #777; min-height: 0; }
+
+    #languageRow, #breedingCountryRow {
+      margin-top: -7px;
+      margin-bottom: 0px;
+      margin-left: 3px;
+    }
+
+    #languageSelect, #breedingCountry {
+      appearance: none;
+      padding: 6px 28px 6px 10px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      font-size: 13px;
+      background-color: #fff;
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 20 20'><polygon points='0,0 20,0 10,12' fill='%23666'/></svg>");
+      background-repeat: no-repeat;
+      background-position: right 8px center;
+      cursor: pointer;
+    }
+
+    #languageSelect:focus, #breedingCountry:focus { outline: none; border-color: #1c7ed6; }
+    .green { color: green; }
+    .red { color: red; }
+  </style>
+</head>
+<body>
+<header>
+  <h1>
+    <span style="color:#1c7ed6;">ebird</span><span style="color:#000000;">2</span><span style="color:#ff7b00;">ornitho</span>
+  </h1>
+  <div id="status">Bereit</div>
+</header>
+
+<main>
+
+  <!-- Optionen -->
+  <div class="data-card">
+    <div class="data-item">
+      <label><input type="checkbox" id="includeSubspecies"> Unterarten extrahieren</label>
+    </div>
+    <div class="data-item" id="languageRow">
+      <span class="label">Sprache eBird-Artnamen:</span>
+      <select id="languageSelect">
+        <option value="de">Deutsch</option>
+        <option value="en">Englisch</option>
+        <option value="fr">Französisch</option>
+      </select>
+    </div>
+    <div class="data-item">
+      <label><input type="checkbox" id="includeComments"> Kommentare extrahieren</label>
+    </div>
+    <div class="data-item">
+      <label><input type="checkbox"  id="enableBreedingCodes"> Atlascodes extrahieren</label>
+    </div>
+  </div>
+
+  <button id="extractBtn">Daten von eBird erfassen</button>
+
+  <!-- Datenanzeige -->
+  <div class="data-card">
+    <div class="data-item">
+      <span class="label">Datum:</span>
+      <span id="dateDisplay">—</span>
+    </div>
+    <div class="data-item">
+      <span class="label">Zeit:</span>
+      <span id="timeDisplay">—</span>
+    </div>
+    <div class="data-item" id="commentRow" style="display:none;">
+      <span class="label">Checklisten-Kommentar:</span>
+    </div>
+    <div class="comment empty" id="commentText">(Kein Checklisten-Kommentar)</div>
+    <div class="data-item">
+      <span class="label">Anzahl Taxa gefunden:</span>
+      <span id="speciesCombined"><span>—</span></span>
+    </div>
+  </div>
+
+  <button id="insertBtn">Metadaten in Ornitho einfügen</button>
+  <button id="transferSpeciesBtn">Arten in Ornitho einfügen</button>
+
+	<!-- Fehlgeschlagene Arten -->
+<div class="data-card" id="failedSpeciesList" style="color:#b00000; display:none;">
+  <strong>Manuell einzufügende Arten:</strong>
+  <div id="failedSpeciesItems">
+    <!-- Einzelne Arten, die komplett nicht eingefügt werden konnten -->
+  </div>
+</div>
+
+<!-- Fehlerhafte Atlascodes -->
+<div class="data-card" id="failedAtlasList" style="color:#b00000; display:none;">
+  <strong>Manuell einzufügende Atlascodes:</strong>
+  <div id="failedAtlasItems">
+    <!-- Einzelne Arten mit fehlerhaftem AC werden hier eingefügt -->
+  </div>
+</div>
+
+
+
+
+<!-- Debug
+<div style="margin-top:10px;font-size:12px;color:#333;">
+    <span>Debug Artenliste:</span>
+    <pre id="speciesDebug" style="white-space:pre-wrap;
+          background:#eee;
+          padding:6px;
+          border-radius:4px;
+          max-height:200px;
+          overflow-y:auto;">
+      (keine Daten)
+    </pre>
+  </div> 
+-->
+
+
+</main>
+
+<script src="sidepanel.js"></script>
+</body>
+</html>
