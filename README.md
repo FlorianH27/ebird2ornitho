@@ -3,11 +3,10 @@
 
 ## Installation 
 (auf Microsoft Edge und Google Chrome getestet)
-ZIP extrahieren und in beliebigem Ordner abspeichern
 
-Erweiterungen -> Erweiterungen verwalten -> Entwicklermodus einschalten -> Entpackte Dateien laden -> fertig
-
-Optional: Kann im Browser für schnelleren Zugriff an Symbolleiste gepinnt werden
+1. ZIP extrahieren und in beliebigem Ordner abspeichern
+2. Erweiterungen -> Erweiterungen verwalten -> Entwicklermodus einschalten -> Entpackte Dateien laden -> fertig
+3. Optional: Kann im Browser für schnelleren Zugriff an Symbolleiste gepinnt werden
 
 ## Anleitung
 1. ebird Checkliste in eigenem Tab öffnen -> Klick auf ebird Button in der Erweiterung, um Daten auszulesen
