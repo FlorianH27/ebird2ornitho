@@ -1,3 +1,71 @@
+// --- Einstellungen ---
+const settingsIcon = document.getElementById("settingsIcon");
+const settingsMenu = document.getElementById("settingsMenu");
+const strassentaubeCheckbox = document.getElementById("enableStrassentaube");
+
+// Menü öffnen / schließen
+settingsIcon.addEventListener("click", (e) => {
+  e.stopPropagation(); // verhindert dass document-click das Menü direkt wieder schließt
+  settingsMenu.style.display =
+    settingsMenu.style.display === "block" ? "none" : "block";
+});
+
+// Klick außerhalb des Menüs schließt es
+document.addEventListener("click", (e) => {
+  if (!settingsMenu.contains(e.target) && e.target !== settingsIcon) {
+    settingsMenu.style.display = "none";
+  }
+});
+
+// Checkbox initialisieren
+chrome.storage.local.get({ enableStrassentaube: false }, (opts) => {
+  strassentaubeCheckbox.checked = opts.enableStrassentaube;
+});
+
+// Checkbox speichern bei Änderung
+strassentaubeCheckbox.addEventListener("change", () => {
+  const checked = strassentaubeCheckbox.checked;
+  chrome.storage.local.set({ enableStrassentaube: checked });
+  strassentaubeEnabled = checked; // <-- Variable direkt aktualisieren
+});
+
+
+
+//------------ Highcount
+/// -------- Highcount --------
+const highCountCheckbox = document.getElementById("enableHighCountString");
+const highCountInput = document.getElementById("highCountString");
+
+function updateHighCountState() {
+  highCountInput.disabled = !highCountCheckbox.checked;
+}
+
+// Initial laden
+chrome.storage.local.get(
+  { enableHighCountString: false, highCountString: "" },
+  ({ enableHighCountString, highCountString }) => {
+    highCountCheckbox.checked = enableHighCountString;
+    highCountInput.value = highCountString;
+    updateHighCountState();
+  }
+);
+
+// Checkbox ändern
+highCountCheckbox.addEventListener("change", () => {
+  chrome.storage.local.set({
+    enableHighCountString: highCountCheckbox.checked
+  });
+  updateHighCountState();
+});
+
+// String ändern
+highCountInput.addEventListener("input", () => {
+  chrome.storage.local.set({
+    highCountString: highCountInput.value
+  });
+});
+
+
 // --- robuster Update-Check ---
 async function checkUpdate() {
   const localVersion = chrome.runtime.getManifest().version.trim();
@@ -27,8 +95,8 @@ async function checkUpdate() {
     }
   } catch (e) {
     console.error("Update-Check fehlgeschlagen:", e);
-    statusEl.textContent = "Fehler beim Update-Check";
-    statusEl.style.color = "#d9534f";
+    statusEl.textContent = "Bereit";
+    statusEl.style.color = "#000000";
   }
 }
 
@@ -142,13 +210,9 @@ langSelect.addEventListener("change", () => chrome.storage.local.set({ ebirdLang
 
 // ----------------- Atlascodes / Brutzeitcodes -----------------
 const breedingCheckbox = document.getElementById("enableBreedingCodes");
-const breedingCountryRow = document.getElementById("breedingCountryRow");
-const breedingCountrySelect = document.getElementById("breedingCountry");
 
 chrome.storage.local.get({ enableBreedingCodes: false}, (opts) => {
   breedingCheckbox.checked = opts.enableBreedingCodes;
-  breedingCountrySelect.value = opts.breedingCountry;
-  breedingCountryRow.style.display = breedingCheckbox.checked ? "flex" : "none";
 });
 
 breedingCheckbox.addEventListener("change", () => 
