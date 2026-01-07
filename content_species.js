@@ -77,7 +77,6 @@ async function transferSpecies(speciesData) {
     const atlascodesSupported = !!country;
 
 
-
     for (let i = 0; i < speciesData.length; i++) {
         const sp = speciesData[i];
         let specieEl = findSpeciesContainer(sp.birdID);
@@ -103,14 +102,46 @@ async function transferSpecies(speciesData) {
             continue;
         }
 
-        // Kommentar setzen
-        const opts = await new Promise(resolve =>
-            chrome.storage.local.get({ includeComments: true }, resolve)
-        );
-        if (opts.includeComments) {
-            const textarea = findCommentTextarea(specieEl);
-            if (textarea) textarea.value = sp.comment || '';
-        }
+// Kommentar setzen
+const [highCountOpts, commentOpts] = await Promise.all([
+  new Promise(resolve =>
+    chrome.storage.local.get(
+      { enableHighCountString: false, highCountString: '' },
+      resolve
+    )
+  ),
+  new Promise(resolve =>
+    chrome.storage.local.get({ includeComments: true }, resolve)
+  )
+]);
+
+const textarea = findCommentTextarea(specieEl);
+if (!textarea) return;
+
+let comment = (sp.comment || '').trim();
+const highStr = (highCountOpts.highCountString || '').trim();
+
+console.log("HighCount-String aus Storage:", highStr);
+console.log("Kommentar:", comment);
+
+if (commentOpts.includeComments) {
+  if (
+    highCountOpts.enableHighCountString &&
+    highStr.length > 0 &&
+    comment.toLowerCase().includes(highStr.toLowerCase())
+  ) {
+    console.log("Kommentar enthält HighCount-String -> Kommentar wird nicht übernommen");
+    textarea.value = '';
+  } else {
+    console.log("Kommentar wird übernommen");
+    textarea.value = comment;
+  }
+} else {
+  console.log("Kommentare deaktiviert -> Kommentar wird gelöscht");
+  textarea.value = '';
+}
+
+
 
         // Anzahl setzen
         if (String(sp.count).trim().toUpperCase() === "X") {
