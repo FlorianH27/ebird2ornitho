@@ -3,6 +3,84 @@
 <head>
   <meta charset="UTF-8">
   <style>
+
+
+
+#settingsWrapper {
+  position: relative;
+}
+
+#settingsIcon {
+  position: relative;
+  top: 11px;
+  right: 4px;
+  cursor: pointer;
+  font-size: 18px;
+  user-select: none;
+}
+
+#settingsMenu {
+  width: 220px;
+  max-height: 300px;
+  overflow-y: auto;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  width: 280px;
+  padding: 10px;
+  position: absolute;
+  right: 0;
+  top: 40px;
+  display: none;
+  z-index: 1000;
+
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+/* Jedes Einstellungs-Item */
+#settingsMenu label.settings-item {
+  display: flex;
+  flex-direction: column;   /* Checkbox+Titel oben, Beschreibung darunter */
+  gap: 2px;                 /* kleiner Abstand zwischen Titel-Row und Beschreibung */
+  cursor: pointer;
+  padding: 4px 8px;         /* etwas Abstand vom Rand des Menüs */
+  box-sizing: border-box;
+}
+
+/* Row für Checkbox + Titel */
+#settingsMenu label.settings-item .checkbox-title-row {
+  display: flex;
+  align-items: center;      /* Titel vertikal zur Checkbox zentrieren */
+  gap: 8px;                 /* Abstand Checkbox <-> Titel */
+}
+
+/* Checkbox */
+#settingsMenu label.settings-item input[type="checkbox"] {
+  margin: 0;                /* keine Verschiebung */
+  flex-shrink: 0;           /* Checkbox bleibt immer gleich groß */
+}
+
+/* Titel */
+#settingsMenu label.settings-item .settings-title {
+  font-weight: 600;
+  font-size: 13px;
+  line-height: 1.2;
+}
+
+/* Beschreibung */
+#settingsMenu label.settings-item .settings-desc {
+  font-size: 12px;
+  color: #666;
+  line-height: 1.3;
+  margin: 0;                /* bündig links mit Titel */
+  padding-left: calc(8px + 18px - 5px); 
+  /* Erklärung padding-left: Menü-Padding (8px) + Checkbox-Breite (~18px) + gap (8px), damit Text direkt unter Titel beginnt */
+}
+
+
+
     body {
       margin: 0;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -133,12 +211,64 @@
   </style>
 </head>
 <body>
-<header>
-  <h1>
-    <span style="color:#1c7ed6;">ebird</span><span style="color:#000000;">2</span><span style="color:#ff7b00;">ornitho</span>
-  </h1>
-  <div id="status">Bereit</div>
+<header style="position: relative;">
+  <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+    <div>
+      <h1>
+        <span style="color:#1c7ed6;">ebird</span><span style="color:#000000;">2</span><span style="color:#ff7b00;">ornitho</span>
+      </h1>
+      <div id="status">Bereit</div>
+    </div>
+
+    <!-- Settings Icon -->
+<img id="settingsIcon" src="settings.png" alt="Einstellungen" title="Einstellungen" style="width:16px; height:16px; cursor:pointer;">
+  </div>
+
+  <!-- Settings Menu -->
+  <div id="settingsMenu" style="
+      display: none;
+      position: absolute;
+      top: 47px;
+      right: 17px;
+      background: #fff;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      padding: 8px;
+      font-size: 13px;
+      z-index: 1000;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  ">
+
+<label class="settings-item">
+  <div class="checkbox-title-row">
+    <input type="checkbox" id="enableStrassentaube">
+    <div class="settings-title">Felsen- immer als Strassentaube erfassen</div>
+  </div>
+  <div class="settings-desc">
+    Dadurch wird Felsentaube (Strassentaube) auch bei deaktiviertem "Unterarten extrahieren" als Strassentaube erfasst.
+  </div>
+</label>
+<label class="settings-item">
+  <div class="checkbox-title-row">
+    <input type="checkbox" id="enableHighCountString">
+    <input
+      type="text"
+      id="highCountString"
+      class="settings-input"
+      placeholder="Standard High-Count Text"
+    >
+  </div>
+  <div class="settings-desc">
+    Kommentare, die diesen Text enthalten, werden auch bei aktiviertem "Kommentare extrahieren" nicht erfasst.
+  </div>
+</label>
+
+
+
+
+      </div>
 </header>
+
 
 <main>
 
@@ -159,7 +289,7 @@
       <label><input type="checkbox" id="includeComments"> Kommentare extrahieren</label>
     </div>
     <div class="data-item">
-      <label><input type="checkbox"  id="enableBreedingCodes"> Atlascodes extrahieren</label>
+      <label><input type="checkbox"  id="enableBreedingCodes"> Atlas-/Brutzeitcodes extrahieren</label>
     </div>
   </div>
 
@@ -198,7 +328,7 @@
 
 <!-- Fehlerhafte Atlascodes -->
 <div class="data-card" id="failedAtlasList" style="color:#b00000; display:none;">
-  <strong>Manuell einzufügende Atlascodes:</strong>
+  <strong>Manuell einzufügende Atlas-/Brutzeitcodes:</strong>
   <div id="failedAtlasItems">
     <!-- Einzelne Arten mit fehlerhaftem AC werden hier eingefügt -->
   </div>
@@ -207,7 +337,7 @@
 
 
 
-<!-- Debug
+<!-- Debug 
 <div style="margin-top:10px;font-size:12px;color:#333;">
     <span>Debug Artenliste:</span>
     <pre id="speciesDebug" style="white-space:pre-wrap;
@@ -219,10 +349,38 @@
       (keine Daten)
     </pre>
   </div> 
+
 -->
 
-
 </main>
+
+<!-- Footer / Copyright -->
+<div id="footer">
+  © Florian Hatt
+</div>
+
+<style>
+  #footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 20px;
+    background: #f2f2f2;
+    border-top: 1px solid #ccc;
+    font-size: 9px;
+    color: #666;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 999;
+  }
+
+  /* damit Inhalt nicht vom Footer überdeckt wird */
+  body {
+    padding-bottom: 28px;
+  }
+</style>
 
 <script src="sidepanel.js"></script>
 </body>
