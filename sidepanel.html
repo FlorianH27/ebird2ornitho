@@ -356,7 +356,14 @@
 
 <!-- Footer / Copyright -->
 <div id="footer">
-  © Florian Hatt
+  <span>© Florian Hatt</span>
+
+  <a href="https://github.com/FlorianH27/ebird2ornitho/issues"
+     target="_blank"
+     title="Bug melden"
+     id="bugReportFooter">
+    <img src="bug.png" alt="Bug melden">
+  </a>
 </div>
 
 <style>
@@ -376,7 +383,19 @@
     z-index: 999;
   }
 
-  /* damit Inhalt nicht vom Footer überdeckt wird */
+  #bugReportFooter {
+    position: absolute;
+    right: 6px;
+    display: flex;
+    align-items: center;
+  }
+
+  #bugReportFooter img {
+    width: 12px;
+    height: 12px;
+    cursor: pointer;
+  }
+
   body {
     padding-bottom: 28px;
   }
