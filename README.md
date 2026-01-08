@@ -12,4 +12,7 @@
 1. ebird Checkliste in eigenem Tab öffnen → Klick auf "Daten von eBird erfassen" in der Erweiterung, um Daten auszulesen
 2. Ornitho soweit manuell bedienen, bis Metadaten für Liste eingetragen werden müssen → Klick auf "Metadaten in Ornitho einfügen"
 3. Liste speichern und warten bis leeres Listen Template geladen ist in Ornitho
-4. Klick auf "Arten in Ornitho einfügen" → Liste wie gewohnt speichern → fertig! 
+4. Klick auf "Arten in Ornitho einfügen" → Liste wie gewohnt speichern → fertig!
+
+## Buy me a coffee
+Wer dieses Projekt unterstützen will, darf gerne hier vorbeischauen: https://buymeacoffee.com/florian_hatt
