@@ -88,7 +88,6 @@ async function checkUpdate() {
 
     if (compareVersions(remoteVersion, localVersion) > 0) {
       statusEl.innerHTML = `<a href="https://github.com/FlorianH27/ebird2ornitho/releases/latest" target="_blank">Update verfügbar: ${remoteVersion}</a>`;
-      statusEl.style.color = "#28a745";
     } else {
       statusEl.textContent = "Bereit";
       statusEl.style.color = "#000000";
