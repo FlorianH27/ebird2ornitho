@@ -5,7 +5,7 @@
 
 1. ZIP herunterladen (https://github.com/FlorianH27/ebird2ornitho/releases)
 2. ZIP extrahieren und in beliebigem Ordner abspeichern
-3. Erweiterungen → Erweiterungen verwalten → Entwicklermodus einschalten → Entpackte Dateien laden → Ordner auswählen → fertig
+3. Browser → Erweiterungen → Erweiterungen verwalten → Entwicklermodus aktivieren → Entpackte Dateien laden → Ordner auswählen → fertig
 4. Optional: Kann im Browser für schnelleren Zugriff an Symbolleiste gepinnt werden
 
 ## Kurzanleitung
