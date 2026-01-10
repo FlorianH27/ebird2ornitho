@@ -175,8 +175,8 @@
       background: #f1f5f9;
       padding: 10px;
       border-radius: 6px;
-      min-height: 40px;
-      max-height: 40px;
+      min-height: 10px;
+      max-height: 30px;
       overflow-y: auto;
       white-space: pre-wrap;
       font-style: italic;
@@ -186,13 +186,14 @@
 
     .comment.empty { color: #777; min-height: 0; }
 
-    #languageRow, #breedingCountryRow {
+    #languageRow {
       margin-top: -7px;
       margin-bottom: 0px;
       margin-left: 3px;
     }
 
-    #languageSelect, #breedingCountry {
+    #languageSelect {
+margin-top: 3px;
       appearance: none;
       padding: 6px 28px 6px 10px;
       border-radius: 6px;
@@ -205,7 +206,7 @@
       cursor: pointer;
     }
 
-    #languageSelect:focus, #breedingCountry:focus { outline: none; border-color: #1c7ed6; }
+    #languageSelect:focus { outline: none; border-color: #1c7ed6; }
     .green { color: green; }
     .red { color: red; }
   </style>
