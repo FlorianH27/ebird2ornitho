@@ -51,10 +51,13 @@ function setComment(text) {
   const ta = document.querySelector('textarea[name="form_comment_REM"]');
   if (!ta) return;
 
+  if (ta.value.trim() !== "") return;
+
   ta.value = text || "";
   ta.dispatchEvent(new Event("input", { bubbles: true }));
   ta.dispatchEvent(new Event("change", { bubbles: true }));
 }
+
 
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   if (msg.action === "fillFromStorage") {
