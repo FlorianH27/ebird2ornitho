@@ -15,11 +15,11 @@ eBird:
 3. Klick auf "Daten von eBird erfassen" um Daten auszulesen
 
 Ornitho:
-5. Soweit manuell bedienen, bis Metadaten für Liste eingetragen werden müssen
-6. Klick auf "Metadaten in Ornitho einfügen"
-7. Liste wie gewohnt speichern und warten bis leeres Listen Template geladen ist
-8. Klick auf "Arten in Ornitho einfügen"
-9. Wie gewohnt speichern → fertig!
+1. Soweit manuell bedienen, bis Metadaten für Liste eingetragen werden müssen
+2. Klick auf "Metadaten in Ornitho einfügen"
+3. Liste wie gewohnt speichern und warten bis leeres Listen Template geladen ist
+4. Klick auf "Arten in Ornitho einfügen"
+5. Wie gewohnt speichern → fertig!
 
 ## Buy me a coffee
 Wer dieses Projekt unterstützen will, darf gerne hier vorbeischauen: https://buymeacoffee.com/florian_hatt
