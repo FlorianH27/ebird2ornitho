@@ -9,11 +9,17 @@
 4. Optional: Kann im Browser für schnelleren Zugriff an Symbolleiste gepinnt werden
 
 ## Kurzanleitung
-1. ebird Checkliste in eigenem Tab öffnen → im Browser klicken auf Erweiterungen → ebird2ornitho
-2. Klick auf "Daten von eBird erfassen" um Daten auszulesen
-3. Ornitho soweit manuell bedienen, bis Metadaten für Liste eingetragen werden müssen → Klick auf "Metadaten in Ornitho einfügen"
-4. Liste speichern und warten bis leeres Listen Template geladen ist in Ornitho
-5. Klick auf "Arten in Ornitho einfügen" → Liste wie gewohnt speichern → fertig!
+eBird:
+1. ebird Checkliste in eigenem Tab öffnen
+2. ebird2ornitho Erweiterung öffnen
+3. Klick auf "Daten von eBird erfassen" um Daten auszulesen
+
+Ornitho:
+5. Soweit manuell bedienen, bis Metadaten für Liste eingetragen werden müssen
+6. Klick auf "Metadaten in Ornitho einfügen"
+7. Liste wie gewohnt speichern und warten bis leeres Listen Template geladen ist
+8. Klick auf "Arten in Ornitho einfügen"
+9. Wie gewohnt speichern → fertig!
 
 ## Buy me a coffee
 Wer dieses Projekt unterstützen will, darf gerne hier vorbeischauen: https://buymeacoffee.com/florian_hatt
