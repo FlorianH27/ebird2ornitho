@@ -224,30 +224,32 @@ chrome.storage.local.get({ includeComments: true }, (opts) => commentsCheckbox.c
 commentsCheckbox.addEventListener("change", () => chrome.storage.local.set({ includeComments: commentsCheckbox.checked }));
 
 // ----------------- Daten aus eBird -----------------
+// ----------------- Daten aus eBird inkl. Koordinaten -----------------
 document.getElementById("extractBtn").addEventListener("click", async () => {
   setStatus("ebird wird ausgelesen...");
 
-  // Fehlgeschlagene Arten Box ausblenden beim Klick
+  // Fehlgeschlagene Arten Box ausblenden
   const failedEl = document.getElementById("failedSpeciesList");
   failedEl.style.display = "none";
   const failedItems = document.getElementById("failedSpeciesItems");
   failedItems.innerHTML = "";
 
-// Fehlerhafte Atlascode Box ausblenden
-    const atlasEl = document.getElementById("failedAtlasList");
-    const atlasItems = document.getElementById("failedAtlasItems");
-    atlasEl.style.display = "none";
-    atlasItems.innerHTML = "";
-
-
+  // Fehlerhafte Atlascode Box ausblenden
+  const atlasEl = document.getElementById("failedAtlasList");
+  const atlasItems = document.getElementById("failedAtlasItems");
+  atlasEl.style.display = "none";
+  atlasItems.innerHTML = "";
 
   chrome.tabs.query({ active: true, currentWindow: true }, async ([tab]) => {
     if (!tab) { setStatus("Kein aktiver Tab"); return; }
-    chrome.tabs.sendMessage(tab.id, { action: "extractEbird" }, async (res) => {
-      if(!res){ setStatus("Keine Daten gefunden"); return; }
 
+    // eBird-Daten abrufen (inkl. Koordinaten und Ort)
+    chrome.tabs.sendMessage(tab.id, { action: "extractEbird" }, async (res) => {
+      if (!res) { setStatus("Keine Daten gefunden"); return; }
+
+      // Arten abrufen
       chrome.tabs.sendMessage(tab.id, { action: "extractSpecies" }, async (speciesList) => {
-        if(!speciesList) speciesList = [];
+        if (!speciesList) speciesList = [];
 
         const lang = await getEbirdLanguage();
         const map = await loadSpeciesMap();
@@ -262,14 +264,25 @@ document.getElementById("extractBtn").addEventListener("click", async () => {
         });
 
         res.speciesList = speciesListWithCode;
+
+        // Koordinaten sicherstellen (falls null)
+        if (!res.coordinates) res.coordinates = null;
+
+        // **Ort sicherstellen (falls nicht vorhanden)**
+        if (!res.location) res.location = null;
+
+        // Daten anzeigen
         showData(res);
 
+        // Daten inkl. Koordinaten und Ort im Local Storage speichern
         chrome.storage.local.set({ ebirdData: res, speciesData: speciesListWithCode });
         setStatus("Daten erfolgreich extrahiert");
       });
     });
   });
 });
+
+
 
 // ----------------- Ornitho Buttons -----------------
 document.getElementById("insertBtn").addEventListener("click", () => {
@@ -400,3 +413,5 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
 function getEbirdLanguage() {
   return new Promise(resolve => chrome.storage.local.get({ebirdLang:"en"}, ({ebirdLang})=>resolve(ebirdLang)));
 }
+
+
