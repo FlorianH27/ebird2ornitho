@@ -28,6 +28,11 @@
       "matches": ["https://*.ebird.org/*"],
       "js": ["content_ebird.js"]
     },
+	{
+      "matches": ["<all_urls>"],
+      "js": ["content_map.js"]
+    },
+
     {
       "matches": ["<all_urls>"],
       "js": ["content_ornitho.js"]
@@ -39,4 +44,3 @@
 
   ]
 }
-
