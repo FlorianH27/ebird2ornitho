@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "ebird2ornitho",
-  "version": "1.1.1",
+  "version": "1.2.0",
   "description": "Füllt auf Ornitho-Portalen das Template der Beobachtungslisten mit Daten aus eBird",
 
   "permissions": [
@@ -44,3 +44,4 @@
 
   ]
 }
+
