@@ -17,6 +17,8 @@ function parseDurationText(text) {
 }
 
 // ----------------- eBird Daten Extraktion -----------------
+// ----------------- eBird Daten Extraktion inkl. Koordinaten -----------------
+// ----------------- eBird Daten Extraktion inkl. Koordinaten und Ortsname -----------------
 function extractEbirdData() {
   try {
     // Startzeit auslesen
@@ -30,10 +32,9 @@ function extractEbirdData() {
       startDate = new Date(datetime);
       if (isNaN(startDate)) startDate = null;
     }
-
     if (!startDate) startDate = new Date();
 
-    // Dauer aus dem Badge-Label extrahieren
+    // Dauer aus Badge
     const durationLabel = Array.from(document.querySelectorAll(".Badge-label"))
       .find(span => /(\d+\s*(h|hr|heure|m|min|minute))/.test(span.textContent.toLowerCase()));
 
@@ -42,25 +43,36 @@ function extractEbirdData() {
 
     const endDate = new Date(startDate.getTime() + durationMinutes * 60 * 1000);
 
-    // Kommentar auslesen
+    // Kommentar
     let comment = "";
-    const commentEl = document.querySelector(
-      'section[aria-labelledby="checklist-comments"] p:not(.u-text-1)'
-    );
+    const commentEl = document.querySelector('section[aria-labelledby="checklist-comments"] p:not(.u-text-1)');
     if (commentEl) comment = commentEl.textContent.trim();
+
+    // Koordinaten
+    let lat = null, lon = null;
+    const mapLink = document.querySelector('a[href^="https://www.google.com/maps/search/?api=1&query="]');
+    if (mapLink) {
+      const query = mapLink.href.split("query=")[1];
+      if (query) {
+        const [latStr, lonStr] = query.split(",");
+        lat = parseFloat(latStr);
+        lon = parseFloat(lonStr);
+      }
+    }
+
+    // **Ort auslesen**
+    let locationName = null;
+    const locationEl = document.querySelector('div.Heading--h3 span:not(.is-visuallyHidden)');
+    if (locationEl) locationName = locationEl.textContent.trim();
 
     return {
       start: startDate.toISOString(),
       end: endDate.toISOString(),
-      displayStart: startDate.toLocaleString("de-DE", {
-        dateStyle: "short",
-        timeStyle: "short"
-      }),
-      displayEnd: endDate.toLocaleTimeString("de-DE", {
-        hour: "2-digit",
-        minute: "2-digit"
-      }),
-      comment
+      displayStart: startDate.toLocaleString("de-DE", { dateStyle: "short", timeStyle: "short" }),
+      displayEnd: endDate.toLocaleTimeString("de-DE", { hour: "2-digit", minute: "2-digit" }),
+      comment,
+      coordinates: lat !== null && lon !== null ? { lat, lon } : null,
+      location: locationName // <-- neuer Wert
     };
   } catch (err) {
     console.error("Error extracting eBird data:", err);
@@ -69,7 +81,9 @@ function extractEbirdData() {
       end: new Date().toISOString(),
       displayStart: "(kein Datum)",
       displayEnd: "(kein Datum)",
-      comment: ""
+      comment: "",
+      coordinates: null,
+      location: null // <-- fallback
     };
   }
 }
@@ -161,6 +175,28 @@ async function shouldSetComment(comment) {
 }
 
 
+function extractCoordinates() {
+  try {
+    const mapLink = document.querySelector('a[href^="https://www.google.com/maps/search/?api=1&query="]');
+    if (!mapLink) return null;
+
+    const url = new URL(mapLink.href);
+    const query = url.searchParams.get("query"); // "47.6112553,9.2966437"
+    if (!query) return null;
+
+    const [latStr, lonStr] = query.split(",");
+    const lat = parseFloat(latStr);
+    const lon = parseFloat(lonStr);
+
+    if (isNaN(lat) || isNaN(lon)) return null;
+
+    return { lat, lon };
+  } catch (err) {
+    console.error("Error extracting coordinates:", err);
+    return null;
+  }
+}
+
 // ----------------- Message Listener -----------------
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   if (msg.action === "extractEbird") {
@@ -170,6 +206,10 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   if (msg.action === "extractSpecies") {
     extractSpecies().then(list => sendResponse(list));
     return true; // async sendResponse
+  }
+
+  if (msg.action === "extractCoordinates") {
+    sendResponse(extractCoordinates());
   }
 
   return true;
