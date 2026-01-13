@@ -15,7 +15,7 @@ eBird:
 3. Klick auf "Daten von eBird erfassen" um Daten auszulesen
 
 Ornitho:
-1. Soweit manuell bedienen, bis Metadaten für Liste eingetragen werden müssen
+1. Ornitho manuell bedienen bis Metadaten eingegeben werden (ggf. zuvor "Auf eBird Location zoomen" verwenden) 
 2. Klick auf "Metadaten in Ornitho einfügen"
 3. Liste wie gewohnt speichern und warten bis leeres Listen Template geladen ist
 4. Klick auf "Arten in Ornitho einfügen"
