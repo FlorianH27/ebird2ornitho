@@ -1,7 +1,7 @@
 # ebird2ornitho
 
 ## Installation 
-(auf Microsoft Edge und Google Chrome getestet)
+(Nur auf Microsoft Edge und Google Chrome)
 
 1. ZIP herunterladen (https://github.com/FlorianH27/ebird2ornitho/releases)
 2. ZIP extrahieren und in beliebigem Ordner abspeichern
