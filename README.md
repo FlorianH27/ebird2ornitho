@@ -1,7 +1,7 @@
 # ebird2ornitho
 
 ## Installation 
-(Auf Microsoft Edge, Google Chrome und Ecosia getestet, funktioniert NICHT auf Firefox oder Safari)
+(Auf Microsoft Edge, Google Chrome und Ecosia erfolgreich getestet, funktioniert NICHT auf Firefox oder Safari)
 
 1. ZIP herunterladen (https://github.com/FlorianH27/ebird2ornitho/releases)
 2. ZIP extrahieren und in beliebigem Ordner abspeichern
