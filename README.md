@@ -20,6 +20,3 @@ Ornitho:
 3. Liste wie gewohnt speichern und warten bis leeres Listen Template geladen ist
 4. Klick auf "Arten in Ornitho einfügen"
 5. Wie gewohnt speichern → fertig!
-
-## Buy me a coffee
-Wer dieses Projekt unterstützen will, darf gerne hier vorbeischauen: https://buymeacoffee.com/florian_hatt
