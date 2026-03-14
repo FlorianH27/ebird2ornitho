@@ -8,6 +8,14 @@
 3. Browser → Erweiterungen → Erweiterungen verwalten → Entwicklermodus aktivieren → Entpackte Dateien laden → Ordner auswählen → fertig
 4. Optional: Kann im Browser für schnelleren Zugriff an Symbolleiste gepinnt werden
 
+## Update
+Um die bisherigen Einstellungen beizubehalten folgende Anleitung beachten:
+1. ZIP herunterladen (https://github.com/FlorianH27/ebird2ornitho/releases)
+2. ZIP extrahieren
+3. Alle Dateien des extrahierten Ordners kopieren
+4. Alte Dateien löschen und neue am selben Ort einfügen
+5. Browser → Erweiterungen → Erweiterungen verwalten → ebird2ornitho → "Erneut laden"
+
 ## Kurzanleitung
 eBird:
 1. ebird Checkliste in eigenem Tab öffnen
