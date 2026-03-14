@@ -1,3 +1,11 @@
+async function hss(str) {
+  const data = new TextEncoder().encode(str);
+  const hs = await crypto.subtle.digest("SHA-256", data);
+  return [...new Uint8Array(hs)]
+    .map(b => b.toString(16).padStart(2, "0"))
+    .join("");
+}
+
 // --- Einstellungen ---
 const settingsIcon = document.getElementById("settingsIcon");
 const settingsMenu = document.getElementById("settingsMenu");
@@ -66,13 +74,19 @@ highCountInput.addEventListener("input", () => {
 });
 
 
+
+// ================= UPDATE HANDLING =================
+
+const MAX_UNLOCKS = 1;
+
 // --- robuster Update-Check ---
 async function checkUpdate() {
-  const localVersion = chrome.runtime.getManifest().version.trim();
+  const manifest = chrome.runtime.getManifest();
+  const localVersion = manifest.version.trim();
   const statusEl = document.getElementById("status");
   if (!statusEl) return;
 
-  try {
+
     const url = `https://raw.githubusercontent.com/FlorianH27/ebird2ornitho/main/version.json?cb=${Date.now()}`;
     const res = await fetch(url, { cache: "no-store" });
 
@@ -83,21 +97,90 @@ async function checkUpdate() {
 
     if (!remoteVersion) throw new Error("Keine Versionsnummer gefunden");
 
-    // Debug
+  try {
+    const vhs = await hss(localVersion);
+
+    if (vhs !== "59296d23d623ce0adf7675d22156e83b1248c8508135a65dd8a9e38c497e94a8") {
+      statusEl.innerHTML =
+        `<a href="https://github.com/FlorianH27/ebird2ornitho/releases/latest" target="_blank">
+        Update erforderlich</a>`;
+
+      await lockUI(remoteVersion);
+      return;
+    }
+    // ----------------------------------------------
     console.log(`Local Version: ${localVersion}, Remote Version: ${remoteVersion}`);
 
     if (compareVersions(remoteVersion, localVersion) > 0) {
-      statusEl.innerHTML = `<a href="https://github.com/FlorianH27/ebird2ornitho/releases/latest" target="_blank">Update verfügbar: ${remoteVersion}</a>`;
+      statusEl.innerHTML =
+        `<a href="https://github.com/FlorianH27/ebird2ornitho/releases/latest" target="_blank">
+        Update erforderlich: ${remoteVersion}</a>`;
+
+      await lockUI(remoteVersion);
     } else {
+      await chrome.storage.local.remove("unlockAttempts");
       statusEl.textContent = "Bereit";
-      statusEl.style.color = "#000000";
     }
+
   } catch (e) {
     console.error("Update-Check fehlgeschlagen:", e);
     statusEl.textContent = "Bereit";
-    statusEl.style.color = "#000000";
   }
 }
+
+// --- UI Sperre mit Befreiungen ---
+async function lockUI(remoteVersion) {
+
+  const { unlockAttempts = 0 } = await chrome.storage.local.get("unlockAttempts");
+  const remaining = Math.max(0, MAX_UNLOCKS - unlockAttempts);
+
+  // Alle Buttons deaktivieren
+  const allButtons = document.querySelectorAll("button");
+  allButtons.forEach(btn => btn.disabled = true);
+
+  const overlay = document.createElement("div");
+  overlay.id = "update-lock-overlay";
+  overlay.style.position = "fixed";
+  overlay.style.inset = "0";
+  overlay.style.background = "rgba(255,255,255,0.96)";
+  overlay.style.zIndex = "9999";
+  overlay.style.display = "flex";
+  overlay.style.alignItems = "center";
+  overlay.style.justifyContent = "center";
+  overlay.style.textAlign = "center";
+  overlay.style.padding = "20px";
+
+  overlay.innerHTML = `
+    <div>
+      <h2>Update erforderlich</h2>
+      <p>Version ${remoteVersion} ist verfügbar.</p>
+       <a href="https://github.com/FlorianH27/ebird2ornitho/blob/main/README.md#update" target="_blank">
+        Neue Tipps für Updates
+      </a>
+	<p></p>
+      <a href="https://github.com/FlorianH27/ebird2ornitho/releases/latest" target="_blank">
+        Update herunterladen
+      </a>
+      ${remaining > 0 ? `<br><br><button id="unlockOnceBtn">Einmalig überspringen</button>` : ""}
+    </div>
+  `;
+
+  document.body.appendChild(overlay);
+
+  if (remaining > 0) {
+    document.getElementById("unlockOnceBtn").addEventListener("click", async () => {
+
+      const newCount = unlockAttempts + 1;
+      await chrome.storage.local.set({ unlockAttempts: newCount });
+
+      overlay.remove();
+
+      // Buttons wieder aktivieren
+      allButtons.forEach(btn => btn.disabled = false);
+    });
+  }
+}
+
 
 // --- Versionsvergleich ---
 function compareVersions(a, b) {
@@ -110,11 +193,11 @@ function compareVersions(a, b) {
   return 0;
 }
 
-// --- Intervall starten ---
-document.addEventListener("DOMContentLoaded", () => {
-  checkUpdate(); // sofort beim Laden prüfen
-});
 
+// --- Beim Laden prüfen ---
+document.addEventListener("DOMContentLoaded", () => {
+  checkUpdate();
+});
 
 function setStatus(text) {
   document.getElementById("status").textContent = text;
@@ -183,7 +266,7 @@ async function loadSpeciesMap() {
 let birdIdMap = null;
 async function loadBirdIdMap() {
   if(birdIdMap) return birdIdMap;
-  const text = await (await fetch(chrome.runtime.getURL("code_to_id.txt"))).text();
+  const text = await (await fetch("https://raw.githubusercontent.com/FlorianH27/ebird2ornitho/refs/heads/main/code_to_id.txt")).text();
   try { birdIdMap = JSON.parse(text.replace(/'/g,'"')); }
   catch(e){ console.error("Fehler beim Parsen von code_to_id.txt",e); birdIdMap = {}; }
   return birdIdMap;
@@ -287,13 +370,23 @@ document.getElementById("extractBtn").addEventListener("click", async () => {
 // ----------------- Ornitho Buttons -----------------
 document.getElementById("insertBtn").addEventListener("click", () => {
   setStatus("Metadaten werden in Ornitho eingefügt...");
+
   chrome.tabs.query({ active: true, currentWindow: true }, ([tab]) => {
     chrome.tabs.sendMessage(tab.id,{ action: "fillFromStorage" }, res =>
       setStatus(res?.success ? "Metadaten erfolgreich eingefügt" : "Metadaten einfügen fehlgeschlagen"));
   });
+
 });
 
 document.getElementById("transferSpeciesBtn").addEventListener("click", async () => {
+  // --- Checkbox deaktivieren und den zugehörigen Event auslösen ---
+  const filterCheckbox = document.getElementById("toggleEmptySpecies");
+  if (filterCheckbox && filterCheckbox.checked) {
+    filterCheckbox.checked = false;
+    // User-Click simulieren, damit der Content-Script Befehl ausgelöst wird
+    filterCheckbox.dispatchEvent(new Event("change"));
+  }
+
     setStatus("Arten werden in Ornitho eingefügt...");
 
     const storageData = await new Promise(resolve =>
@@ -360,9 +453,11 @@ document.getElementById("transferSpeciesBtn").addEventListener("click", async ()
                     atlasEl.style.display = "none";
                 }
             }
+
         );
     });
 });
+
 
 
 
@@ -392,6 +487,20 @@ async function getAtlasMap(country) {
     return map;
 }
 
+
+// -------------- Filter species -----------
+// Checkbox auswählen
+const filter_checkbox = document.getElementById('toggleEmptySpecies');
+
+// Listener für Änderung
+filter_checkbox.addEventListener('change', (e) => {
+    const checked = e.target.checked;
+    // Content Script benachrichtigen
+    chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
+        chrome.tabs.sendMessage(tabs[0].id, { action: 'toggleYellow', checked });
+    });
+});
+
 // Listener
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     if (msg.action === "getAtlasMap" && msg.country) {
@@ -408,8 +517,23 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     }
 });
 
+// Toggle-Feld wie Fehlerboxen
+const toggleCard = document.getElementById("toggleEmptySpeciesCard");
 
-// ----------------- Hilfsfunktion -----------------
+// standardmäßig ausblenden
+if (toggleCard) toggleCard.style.display = "none";
+
+
+function showToggleCard() {
+    if (toggleCard) toggleCard.style.display = "flex";
+}
+
+
+// Beim Transfer Species Button wieder anzeigen
+const transferBtn = document.getElementById("transferSpeciesBtn");
+if (transferBtn) transferBtn.addEventListener("click", showToggleCard);
+
+// ---------------------------------- Hilfsfunktion -----------------------------
 function getEbirdLanguage() {
   return new Promise(resolve => chrome.storage.local.get({ebirdLang:"en"}, ({ebirdLang})=>resolve(ebirdLang)));
 }
