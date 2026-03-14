@@ -6,6 +6,15 @@
 
 
 
+#zoomMapBtn {
+  background-color: #7048e8;
+  color: #fff;
+}
+
+#zoomMapBtn:hover {
+  background-color: #5f3dc4;
+}
+
 #settingsWrapper {
   position: relative;
 }
@@ -222,7 +231,7 @@ margin-top: 3px;
     </div>
 
     <div style="display:flex; align-items:center; gap:6px;">
-  <!-- Buy me a coffee
+  <!-- Buy me a coffee 
   <a href="https://buymeacoffee.com/florian_hatt"
      target="_blank"
      title="Buy me a coffee"
@@ -231,7 +240,8 @@ margin-top: 3px;
     <img src="bmc-logo.png"
          alt="Buy me a coffee"
          style="width:20px; height:20px; cursor:pointer;">
-  </a>  -->
+  </a> -->
+
 
   <!-- Settings Icon -->
   <img id="settingsIcon"
@@ -329,10 +339,92 @@ margin-top: 3px;
     </div>
   </div>
 
+<!-- <button id="zoomMapBtn" style="background-color:#4c6ef5; color:#fff;">Karte Zoom Button einfügen</button> -->
+
+
   <button id="insertBtn">Metadaten in Ornitho einfügen</button>
   <button id="transferSpeciesBtn">Arten in Ornitho einfügen</button>
 
-	<!-- Fehlgeschlagene Arten -->
+
+<!------------------ Toggle Switch für "Leere Arten ausblenden" ------------->
+
+<!-- Standardmäßig ausblenden -->
+<div id="toggleEmptySpeciesCard" style="display: none; flex-direction: column; gap: 4px;">
+  <label class="switch">
+    <input type="checkbox" id="toggleEmptySpecies">
+    <span class="slider round"></span>
+    <span class="switch-label">Leere Arten ausblenden</span>
+  </label>
+</div>
+
+<style>
+  /* Container wie Fehlermeldungsbox */
+#toggleEmptySpeciesCard {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start; /* linksbündig */
+    padding: 6px 10px;
+    border-radius: 6px;
+    background-color: transparent;
+    gap: 4px;
+    font-size: 13px;
+    margin-top: -5px;   /* noch näher zum Button */
+    margin-left: -5;     /* ganz links */
+}
+
+  /* Toggle Switch */
+  .switch {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .switch input {
+    display: none; /* Standard-Checkbox ausblenden */
+  }
+
+  .slider {
+    position: relative;
+    width: 40px;
+    height: 20px;
+    background-color: #ccc;
+    border-radius: 20px;
+    transition: 0.2s;
+    flex-shrink: 0;
+  }
+
+  .slider::before {
+    content: "";
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    left: 2px;
+    top: 2px;
+    background-color: white;
+    border-radius: 50%;
+    transition: 0.2s;
+  }
+
+  /* Wenn Checkbox aktiv */
+  .switch input:checked + .slider {
+    background-color: #1c7ed6;
+  }
+
+  .switch input:checked + .slider::before {
+    transform: translateX(20px);
+  }
+
+  /* Beschriftung rechts neben Switch */
+  .switch-label {
+    font-size: 13px;
+    color: #111;
+    margin: 0;
+  }
+</style>
+
+<!------------------- Fehlgeschlagene Arten ------------------------------>
 <div class="data-card" id="failedSpeciesList" style="color:#b00000; display:none;">
   <strong>Manuell einzufügende Arten:</strong>
   <div id="failedSpeciesItems">
@@ -418,4 +510,3 @@ margin-top: 3px;
 <script src="sidepanel.js"></script>
 </body>
 </html>
-
