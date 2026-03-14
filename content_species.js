@@ -1,4 +1,4 @@
-// ------------------ Atlascode CSV laden ------------------
+ // ------------------ Atlascode CSV laden ------------------
 let atlasMapCache = {};
 
 async function loadAtlasMap(country) {
@@ -167,9 +167,9 @@ if (commentOpts.includeComments) {
 if (breedingEnabled) {
 if (!atlascodesSupported) {
     // Einmalige Meldung, dass Atlascodes für dieses Portal nicht unterstützt werden
-    if (!atlasFailedSpecies.some(e => e.message === "Alle (Atlascodes für dieses Portal nicht implementiert)")) {
+    if (!atlasFailedSpecies.some(e => e.message === "Atlascodes für dieses Portal nicht implementiert")) {
         atlasFailedSpecies.push({
-            message: "Alle (Atlascodes für dieses Portal nicht implementiert)"
+            message: "Atlascodes für dieses Portal nicht implementiert"
         });
     }
 } else {
@@ -216,10 +216,13 @@ if (!atlascodesSupported) {
 // ------------------ Listener ------------------
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     if (msg.action === "transferSpeciesToOrnitho" && Array.isArray(msg.speciesData)) {
+	checkConfirmNext();
         transferSpecies(msg.speciesData).then(sendResponse).catch(err => {
             console.error(err);
             sendResponse({ success: false, message: err.message });
         });
+	document.activeElement.blur();
+	window.scrollTo({ top: 0, behavior: 'smooth' });
         return true;
     }
 });
@@ -257,4 +260,12 @@ function findEstimationSelect(container) {
 
 function findCommentTextarea(container) {
     return container.querySelector('textarea[name^="species["][name$="[comment]"]');
+}
+
+function checkConfirmNext() {
+  const cb = document.getElementById("confirm_next");
+  if (!cb) return;
+
+  cb.checked = true;
+  cb.dispatchEvent(new Event("change", { bubbles: true }));
 }
