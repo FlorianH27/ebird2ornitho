@@ -36,7 +36,7 @@ function insertOrUpdateCustomButton() {
         // Sichtbarkeit und href setzen
         if (ebirdData?.coordinates) {
             const { lat, lon } = ebirdData.coordinates;
-            btnZoom1.href = `javascript:openlayerMap.setCenter(${lat-0.007},${lon},-1,false)`;
+            btnZoom1.href = `javascript:openlayerMap.setCenter(${lat},${lon},-1,false)`;
             btnZoom3.href = `javascript:openlayerMap.setCenter(${lat},${lon},0.5,false)`;
             btnZoom1.style.display = "inline-block";
             btnZoom3.style.display = "inline-block";
