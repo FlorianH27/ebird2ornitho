@@ -100,7 +100,7 @@ async function checkUpdate() {
   try {
     const vhs = await hss(localVersion);
 
-    if (vhs !== "59296d23d623ce0adf7675d22156e83b1248c8508135a65dd8a9e38c497e94a8") {
+    if (vhs !== "74b860b3270666137a4d543c3e3d1e4e473d54636f7593d1c17bf693e6540bbe") {
       statusEl.innerHTML =
         `<a href="https://github.com/FlorianH27/ebird2ornitho/releases/latest" target="_blank">
         Update erforderlich</a>`;
