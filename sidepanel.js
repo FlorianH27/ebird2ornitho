@@ -26,7 +26,7 @@ document.addEventListener("click", (e) => {
 });
 
 // Checkbox initialisieren
-chrome.storage.local.get({ enableStrassentaube: false }, (opts) => {
+chrome.storage.local.get({ enableStrassentaube: true }, (opts) => {
   strassentaubeCheckbox.checked = opts.enableStrassentaube;
 });
 
@@ -50,7 +50,7 @@ function updateHighCountState() {
 
 // Initial laden
 chrome.storage.local.get(
-  { enableHighCountString: false, highCountString: "" },
+  { enableHighCountString: true, highCountString: "Normal hier" },
   ({ enableHighCountString, highCountString }) => {
     highCountCheckbox.checked = enableHighCountString;
     highCountInput.value = highCountString;
