@@ -1,4 +1,6 @@
 function insertOrUpdateCustomButton() {
+
+
     const container = document.querySelector('div > a.alink[href^="javascript:center_city()"]')?.parentElement;
     if (!container) {
         console.warn("Container für Buttons nicht gefunden");
@@ -36,7 +38,7 @@ function insertOrUpdateCustomButton() {
         // Sichtbarkeit und href setzen
         if (ebirdData?.coordinates) {
             const { lat, lon } = ebirdData.coordinates;
-            btnZoom1.href = `javascript:openlayerMap.setCenter(${lat},${lon},-1,false)`;
+            btnZoom1.href = `javascript:openlayerMap.setCenter(${lat-0.0015},${lon},-1,false)`;
             btnZoom3.href = `javascript:openlayerMap.setCenter(${lat},${lon},0.5,false)`;
             btnZoom1.style.display = "inline-block";
             btnZoom3.style.display = "inline-block";
@@ -58,3 +60,6 @@ chrome.storage.onChanged.addListener((changes, area) => {
     }
 
 });
+
+
+
