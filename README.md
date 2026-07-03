@@ -9,7 +9,7 @@
 4. Optional: Kann im Browser für schnelleren Zugriff an Symbolleiste gepinnt werden
 
 ## Update
-Um die bisherigen Einstellungen beizubehalten folgende Anleitung beachten:
+Um die bisherigen Einstellungen beizubehalten, folgende Anleitung beachten:
 1. ZIP herunterladen (https://github.com/FlorianH27/ebird2ornitho/releases)
 2. ZIP extrahieren
 3. Alle Dateien des extrahierten Ordners kopieren
