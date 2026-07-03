@@ -65,7 +65,11 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
       if (!ebirdData) return;
 
       const start = new Date(ebirdData.start);
-      const end = new Date(ebirdData.end);
+const end = new Date(ebirdData.end);
+
+if (start.getTime() === end.getTime()) {
+  end.setMinutes(end.getMinutes() + 5);
+}
 
       // 1. Datum setzen
       setDateInput(start);
@@ -89,7 +93,13 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
       // 6. Kommentar
       setComment(ebirdData.comment);
 
+	const websiteBtn = document.querySelector('body input[name="addform"]');
+      if (websiteBtn) {
+        websiteBtn.focus();
+      }
+
       sendResponse({ success: true });
+
     });
     return true;
   }
