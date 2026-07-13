@@ -1,3 +1,17 @@
+// ----------------- Konfiguration -----------------
+// Liste der Domains, bei denen die Blockade STRIKT sein muss (kein Speichern ohne Code)
+const hardBlockDomains = [
+    "ornitho.it", // Beispiele für Länder, die den CH-Atlascode 1 oder analog kennen
+    "ornitho.ch"
+];
+
+// Automatische Prüfung: Wenn in der Liste -> Hardblock. Wenn NICHT in der Liste -> Standard (Softblock).
+const isHardBlockDomain = hardBlockDomains.some(domain => window.location.hostname.includes(domain));
+
+// Interner Speicher für den Zustand
+let lastMissingCount = 0;
+let hasWarned = false;
+
 // ----------------- Prüfen auf fehlende Atlascodes -----------------
 function checkAtlasCodes() {
     const missing = [];
@@ -60,7 +74,13 @@ function showAtlasWarning() {
         const container = document.getElementById("submit-full")?.parentNode || document.body;
         container.insertBefore(warning, container.firstChild);
     }
-    warning.textContent = "Bitte alle erforderlichen Atlas-/Brutzeitcodes ausfüllen!";
+    
+    // Text passt sich dynamisch an (Standard ist jetzt der Softblock-Hinweis)
+    if (isHardBlockDomain) {
+        warning.textContent = "Bitte alle erforderlichen Atlas-/Brutzeitcodes ausfüllen!";
+    } else {
+        warning.textContent = "Wurden alle erforderlichen Brutzeitcodes ausgefüllt? Nochmaliges Speichern ignoriert diese Warnung";
+    }
 }
 
 function hideAtlasWarning() {
@@ -81,15 +101,40 @@ function insertSaveButtonCheck() {
 
         btn.addEventListener("click", function(e) {
             const missingCount = checkAtlasCodes();
+            
             if (missingCount > 0) {
+                // Sicherheitsnetz: Wenn sich die Anzahl der Fehler verändert hat, 
+                // muss der Nutzer zwingend wieder erst einmal gewarnt werden.
+                if (missingCount !== lastMissingCount) {
+                    hasWarned = false;
+                }
+                lastMissingCount = missingCount;
+
+                // Wenn es KEINE Hardblock-Domain ist und bereits einmal gewarnt wurde -> Speichern erlauben
+                if (!isHardBlockDomain && hasWarned) {
+                    hideAtlasWarning();
+                    hasWarned = false; // Reset für das nächste Mal
+                    
+                    if (originalAttr) {
+                        new Function(originalAttr).call(btn);
+                    }
+                    return; 
+                }
+
+                // Erster Klick (oder eben dauerhafte Blockade auf Hardblock-Plattformen)
                 e.preventDefault();
                 showAtlasWarning();
+                
+                if (!isHardBlockDomain) {
+                    hasWarned = true; // Merken, dass gewarnt wurde
+                }
             } else {
                 hideAtlasWarning();
+                hasWarned = false;
+                lastMissingCount = 0;
 
                 // Original onclick ausführen
                 if (originalAttr) {
-                    // eval in Kontext des Buttons
                     new Function(originalAttr).call(btn);
                 }
             }
