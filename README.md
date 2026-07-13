@@ -9,12 +9,15 @@
 4. Optional: Kann im Browser für schnelleren Zugriff an Symbolleiste gepinnt werden
 
 ## Update
-Um die bisherigen Einstellungen beizubehalten, folgende Anleitung beachten:
+Um die bisherigen Einstellungen sowie die Location Library beizubehalten, folgende Anleitung beachten:
 1. ZIP herunterladen (https://github.com/FlorianH27/ebird2ornitho/releases)
 2. ZIP extrahieren
 3. Alle Dateien des extrahierten Ordners kopieren
-4. Alte Dateien löschen und neue am selben Ort einfügen
-5. Browser → Erweiterungen → Erweiterungen verwalten → ebird2ornitho → "Erneut laden"
+4. Speicherort der alten Dateien öffnen
+5. Alte Dateien löschen und neue am selben Ort einfügen
+6. Browser → Erweiterungen → Erweiterungen verwalten → ebird2ornitho → "Erneut laden"
+
+Zur Sicherheit kann die Location Library vor dem Update kopiert werden und anschliessend im Einstellungs Menu wieder importiert werden.
 
 ## Kurzanleitung
 eBird:
