@@ -99,14 +99,14 @@ function initHighCountSetting() {
   chrome.storage.local.get(["enableHighCountString", "highCountString"], rawData => {
     if (rawData.enableHighCountString === undefined || rawData.highCountString === undefined) {
       chrome.storage.local.set({
-        enableHighCountString: rawData.enableHighCountString !== undefined ? rawData.enableHighCountString : true,
-        highCountString: rawData.highCountString !== undefined ? rawData.highCountString : "Normal hier"
+        enableHighCountString: rawData.enableHighCountString !== undefined ? rawData.enableHighCountString : false,
+        highCountString: rawData.highCountString !== undefined ? rawData.highCountString : ""
       });
       console.log("[eBird2Ornitho] High Count Defaults initial im Storage hinterlegt.");
     }
 
-    checkbox.checked = rawData.enableHighCountString !== undefined ? rawData.enableHighCountString : true;
-    input.value = rawData.highCountString !== undefined ? rawData.highCountString : "Normal hier";
+    checkbox.checked = rawData.enableHighCountString !== undefined ? rawData.enableHighCountString : false;
+    input.value = rawData.highCountString !== undefined ? rawData.highCountString : "";
     updateState();
   });
 
@@ -129,12 +129,12 @@ function initEbirdSettings() {
   const select = document.getElementById("languageSelect");
   if (!checkbox || !languageRow || !select) return;
 
-  chrome.storage.local.get({ includeSubspecies: false, ebirdLang: "en" }, data => {
+  chrome.storage.local.get({ includeSubspecies: false, ebirdLang: "de" }, data => {
     chrome.storage.local.get(["includeSubspecies", "ebirdLang"], rawData => {
       if (rawData.includeSubspecies === undefined || rawData.ebirdLang === undefined) {
         chrome.storage.local.set({
           includeSubspecies: rawData.includeSubspecies !== undefined ? rawData.includeSubspecies : false,
-          ebirdLang: rawData.ebirdLang !== undefined ? rawData.ebirdLang : "en"
+          ebirdLang: rawData.ebirdLang !== undefined ? rawData.ebirdLang : "de"
         });
         console.log("[eBird2Ornitho] eBird-Settings Defaults initial im Storage hinterlegt.");
       }
@@ -162,16 +162,20 @@ function initBreedingSetting() {
   const checkbox = document.getElementById("enableBreedingCodes");
   if (!checkbox) return;
 
-  chrome.storage.local.get({ enableBreedingCodes: false }, data => {
-    chrome.storage.local.get("enableBreedingCodes", rawData => {
-      if (rawData.enableBreedingCodes === undefined) {
-        chrome.storage.local.set({ enableBreedingCodes: data.enableBreedingCodes });
-        console.log("[eBird2Ornitho] Breeding Codes Default initial im Storage hinterlegt.");
-      }
-    });
-    checkbox.checked = data.enableBreedingCodes;
+  // 1. Wir holen den Wert ohne Chrome-Standard (damit wir wissen, ob er undefined ist)
+  chrome.storage.local.get("enableBreedingCodes", rawData => {
+    
+    // Falls er undefined ist, schreiben wir den Default einmalig in den Speicher
+    if (rawData.enableBreedingCodes === undefined) {
+      chrome.storage.local.set({ enableBreedingCodes: true });
+      console.log("[eBird2Ornitho] Breeding Codes Default initial im Storage hinterlegt.");
+    }
+
+    // 2. UI befüllen: Entweder der geladene Wert oder der Default (false)
+    checkbox.checked = rawData.enableBreedingCodes ?? true;
   });
 
+  // 3. Event-Listener für Änderungen
   checkbox.addEventListener("change", () => {
     chrome.storage.local.set({ enableBreedingCodes: checkbox.checked });
   });
@@ -486,7 +490,7 @@ async function loadBirdIdMap() {
 
 function getEbirdLanguage() {
   return new Promise(resolve => {
-    chrome.storage.local.get({ ebirdLang: "en" }, ({ ebirdLang }) => resolve(ebirdLang));
+    chrome.storage.local.get({ ebirdLang: "de" }, ({ ebirdLang }) => resolve(ebirdLang));
   });
 }
 
