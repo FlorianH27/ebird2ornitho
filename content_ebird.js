@@ -16,8 +16,7 @@ function parseDurationText(text) {
   return totalMinutes;
 }
 
-// ----------------- eBird Daten Extraktion -----------------
-// ----------------- eBird Daten Extraktion inkl. Koordinaten -----------------
+
 // ----------------- eBird Daten Extraktion inkl. Koordinaten und Ortsname -----------------
 function extractEbirdData() {
   try {
