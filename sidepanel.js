@@ -1,8 +1,7 @@
 // ======================================================
-// ebird2ornitho - sidepanel.js
+// eBird2Ornitho - sidepanel.js
 // Teil 1: Hilfsfunktionen, Settings, Update-System
 // ======================================================
-
 
 let strassentaubeEnabled = true;
 const MAX_UNLOCKS = 10;
@@ -24,11 +23,9 @@ function setStorage(data) {
 }
 
 async function clearEbirdSessionData() {
-  // Entfernt die alten Daten komplett aus dem lokalen Speicher der Extension
   await chrome.storage.local.remove(["ebirdData", "speciesData"]);
   console.log("[eBird2Ornitho] eBird-Session-Daten beim Öffnen des Sidepanels geleert.");
 }
-
 
 function hideOpenLocationButton() {
   const button = document.getElementById("openLocationBtn");
@@ -61,34 +58,29 @@ function initSettingsMenu() {
 // Teil 2: Settings Initialisierungen (Storage)
 // ======================================================
 
-// ------------------------------------------------------
-// Strassentaube Einstellung
-// ------------------------------------------------------
-async function initStrassentaubeSetting() {
+function initStrassentaubeSetting() {
   const checkbox = document.getElementById("enableStrassentaube");
   if (!checkbox) return;
 
-  const data = await getStorage({ enableStrassentaube: true });
-  const currentSetting = data.enableStrassentaube;
+  getStorage({ enableStrassentaube: true }).then(async data => {
+    const currentSetting = data.enableStrassentaube;
 
-  const rawData = await getStorage("enableStrassentaube");
-  if (rawData.enableStrassentaube === undefined) {
-    await setStorage({ enableStrassentaube: currentSetting });
-    console.log("[eBird2Ornitho] Strassentaube-Standardwert (true) initial im Storage hinterlegt.");
-  }
+    const rawData = await getStorage("enableStrassentaube");
+    if (rawData.enableStrassentaube === undefined) {
+      await setStorage({ enableStrassentaube: currentSetting });
+      console.log("[eBird2Ornitho] Strassentaube-Standardwert (true) initial im Storage hinterlegt.");
+    }
 
-  checkbox.checked = currentSetting;
-  strassentaubeEnabled = currentSetting;
+    checkbox.checked = currentSetting;
+    strassentaubeEnabled = currentSetting;
 
-  checkbox.addEventListener("change", async () => {
-    strassentaubeEnabled = checkbox.checked;
-    await setStorage({ enableStrassentaube: checkbox.checked });
+    checkbox.addEventListener("change", async () => {
+      strassentaubeEnabled = checkbox.checked;
+      await setStorage({ enableStrassentaube: checkbox.checked });
+    });
   });
 }
 
-// ------------------------------------------------------
-// High Count Einstellung
-// ------------------------------------------------------
 function initHighCountSetting() {
   const checkbox = document.getElementById("enableHighCountString");
   const input = document.getElementById("highCountString");
@@ -120,9 +112,6 @@ function initHighCountSetting() {
   });
 }
 
-// ------------------------------------------------------
-// eBird Sprache / Unterarten
-// ------------------------------------------------------
 function initEbirdSettings() {
   const checkbox = document.getElementById("includeSubspecies");
   const languageRow = document.getElementById("languageRow");
@@ -155,35 +144,23 @@ function initEbirdSettings() {
   });
 }
 
-// ------------------------------------------------------
-// Atlas-/Brutzeitcodes
-// ------------------------------------------------------
 function initBreedingSetting() {
   const checkbox = document.getElementById("enableBreedingCodes");
   if (!checkbox) return;
 
-  // 1. Wir holen den Wert ohne Chrome-Standard (damit wir wissen, ob er undefined ist)
   chrome.storage.local.get("enableBreedingCodes", rawData => {
-    
-    // Falls er undefined ist, schreiben wir den Default einmalig in den Speicher
     if (rawData.enableBreedingCodes === undefined) {
       chrome.storage.local.set({ enableBreedingCodes: true });
       console.log("[eBird2Ornitho] Breeding Codes Default initial im Storage hinterlegt.");
     }
-
-    // 2. UI befüllen: Entweder der geladene Wert oder der Default (false)
     checkbox.checked = rawData.enableBreedingCodes ?? true;
   });
 
-  // 3. Event-Listener für Änderungen
   checkbox.addEventListener("change", () => {
     chrome.storage.local.set({ enableBreedingCodes: checkbox.checked });
   });
 }
 
-// ------------------------------------------------------
-// Kommentare
-// ------------------------------------------------------
 function initCommentsSetting() {
   const checkbox = document.getElementById("includeComments");
   if (!checkbox) return;
@@ -203,9 +180,6 @@ function initCommentsSetting() {
   });
 }
 
-// ------------------------------------------------------
-// Atlascodes C/T verwenden Option
-// ------------------------------------------------------
 async function inituseAtlasCodesCTSetting() {
   const checkbox = document.getElementById("useAtlasCodesCT");
   if (!checkbox) return;
@@ -359,8 +333,8 @@ async function lockUI(remoteVersion) {
 
   overlay.innerHTML = `
     <div style="max-width: 400px; background: #fff; padding: 24px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.15);">
-      <h2 style="margin-top: 0;">Version ${remoteVersion} verfügbar</h2>      
-      <a href="https://github.com/FlorianH27/ebird2ornitho/releases/latest" target="_blank" 
+      <h2 style="margin-top: 0;">Version ${remoteVersion} verfügbar</h2>
+      <a href="https://github.com/FlorianH27/ebird2ornitho/releases/latest" target="_blank"
          style="display: block; background: #1c7ed6; color: #fff; text-decoration: none; padding: 12px; border-radius: 6px; font-weight: bold; font-size: 15px; margin: 16px 0;">
         Source Code (zip) herunterladen
       </a>
@@ -394,7 +368,7 @@ async function lockUI(remoteVersion) {
       const data = await chrome.storage.local.get("locationLinks");
       const locationString = data.locationLinks ? JSON.stringify(data.locationLinks, null, 2) : "Keine Location-Links im Speicher gefunden.";
       await navigator.clipboard.writeText(locationString);
-      
+
       btn.style.background = "#f4fce3"; btn.style.color = "#2b8a3e"; btn.style.borderColor = "#b2f2bb"; btn.textContent = "Kopiert!";
       setTimeout(() => {
         btn.style.background = "#fff"; btn.style.color = "#495057"; btn.style.borderColor = "#ced4da"; btn.textContent = "In Zwischenablage kopieren";
@@ -421,15 +395,21 @@ function showData(data) {
   if (!data) return;
   const start = new Date(data.start);
   const end = new Date(data.end);
-  const dateEl = document.getElementById("dateDisplay");
-  const timeEl = document.getElementById("timeDisplay");
 
-  if (dateEl) {
-    dateEl.textContent = start.toLocaleDateString("de-DE", { weekday: "short", day: "2-digit", month: "short", year: "numeric" });
+  // Ort anzeigen
+  const locationEl = document.getElementById("locationDisplay");
+  if (locationEl) {
+    locationEl.textContent = data.location || "—";
   }
-  if (timeEl) {
+
+  // Datum & Zeit zusammen auf einer Zeile anzeigen
+  const dateTimeEl = document.getElementById("dateTimeDisplay");
+  if (dateTimeEl) {
+    const formattedDate = start.toLocaleDateString("de-DE", { day: "2-digit", month: "2-digit", year: "numeric" });
     const formatTime = d => `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
-    timeEl.textContent = `${formatTime(start)} - ${formatTime(end)}`;
+    const formattedTime = `${formatTime(start)} - ${formatTime(end)}`;
+
+    dateTimeEl.textContent = `${formattedDate}, ${formattedTime}`;
   }
 
   const comment = document.getElementById("commentText");
@@ -459,6 +439,8 @@ function showData(data) {
   if (debug) debug.textContent = JSON.stringify(speciesList, null, 2);
 }
 
+
+
 let speciesMap = null;
 async function loadSpeciesMap() {
   if (speciesMap) return speciesMap;
@@ -477,9 +459,7 @@ let birdIdMap = null;
 async function loadBirdIdMap() {
   if (birdIdMap) return birdIdMap;
   try {
-
     const response = await fetch("https://raw.githubusercontent.com/FlorianH27/ebird2ornitho/refs/heads/main/code_to_id.txt");
-
     birdIdMap = JSON.parse((await response.text()).replace(/'/g, '"'));
   } catch(error) {
     console.error("Fehler beim Laden von code_to_id.txt", error);
@@ -507,10 +487,29 @@ async function extractEbirdData() {
   });
 
   try {
-    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+    let [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
     if (!tab) { setStatus("Kein aktiver Tab"); return; }
 
-    const data = await chrome.tabs.sendMessage(tab.id, { action: "extractEbird" });
+    let data;
+    try {
+      data = await chrome.tabs.sendMessage(tab.id, { action: "extractEbird" });
+    } catch (e) {
+      await chrome.tabs.reload(tab.id);
+
+      await new Promise((resolve) => {
+        const listener = (tabId, changeInfo) => {
+          if (tabId === tab.id && changeInfo.status === "complete") {
+            chrome.tabs.onUpdated.removeListener(listener);
+            resolve();
+          }
+        };
+        chrome.tabs.onUpdated.addListener(listener);
+      });
+
+      await new Promise((resolve) => setTimeout(resolve, 500));
+      data = await chrome.tabs.sendMessage(tab.id, { action: "extractEbird" });
+    }
+
     if (!data) { setStatus("Keine Daten gefunden"); return; }
 
     const speciesList = await chrome.tabs.sendMessage(tab.id, { action: "extractSpecies" }) || [];
@@ -540,7 +539,43 @@ async function extractEbirdData() {
 }
 
 // ======================================================
-// Teil 6: Ornitho Actions & Visibility Guards
+// Teil 6: Polygon / Point-in-Polygon Hilfsfunktionen
+// ======================================================
+
+function isPointInPolygon(point, vs) {
+  const x = point[0], y = point[1]; // x = lon, y = lat
+  let inside = false;
+  for (let i = 0, j = vs.length - 1; i < vs.length; j = i++) {
+    const xi = vs[i][0], yi = vs[i][1];
+    const xj = vs[j][0], yj = vs[j][1];
+
+    const intersect = ((yi > y) !== (yj > y)) &&
+        (x < (xj - xi) * (y - yi) / (yj - yi) + xi);
+    if (intersect) inside = !inside;
+  }
+  return inside;
+}
+
+function isPointInCountry(lat, lon, countryData) {
+  if (!countryData.polygons) return false;
+  return countryData.polygons.some(polygon => isPointInPolygon([lon, lat], polygon));
+}
+
+let countryDataCache = null;
+async function loadCountryData() {
+  if (countryDataCache) return countryDataCache;
+  try {
+    const response = await fetch(chrome.runtime.getURL("country_polygons.json"));
+    countryDataCache = await response.json();
+  } catch (e) {
+    console.error("Fehler beim Laden der Länder-Polygone:", e);
+    countryDataCache = {};
+  }
+  return countryDataCache;
+}
+
+// ======================================================
+// Teil 7: Ornitho Actions & Visibility Guards
 // ======================================================
 
 async function insertMetadata() {
@@ -574,7 +609,6 @@ async function transferSpecies() {
     if (el) {el.innerHTML = ""}
   });
 
-
   try {
     const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
     const result = await chrome.tabs.sendMessage(tab.id, { action: "transferSpeciesToOrnitho", speciesData });
@@ -583,8 +617,6 @@ async function transferSpecies() {
     const failedCount = result.failed?.length || 0;
     setStatus(`${speciesData.length - failedCount} von ${speciesData.length} Arten erfolgreich eingefügt`);
 
-
-console.log("Fail", failedCount, document.getElementById("failedSpeciesItems"), document.getElementById("failedSpeciesList"));
     if (failedCount > 0 && document.getElementById("failedSpeciesItems")) {
       document.getElementById("failedSpeciesItems").innerHTML = result.failed.map(s => `${s.name} (${s.count})`).join("<br>");
       document.getElementById("failedSpeciesList").style.display = "flex";
@@ -624,11 +656,10 @@ async function updateLinkButton(forcedUrl = null) {
 
 async function updateTransferButton(forcedUrl = null) {
   const transferButton = document.getElementById("transferSpeciesBtn");
-  const emptySpeciesCard = document.getElementById("toggleEmptySpeciesCard"); 
+  const emptySpeciesCard = document.getElementById("toggleEmptySpeciesCard");
   const failedAtlasList = document.getElementById("failedAtlasList");
-console.log(document.getElementById("failedSpeciesItems"));
   const failedSpeciesList = document.getElementById("failedSpeciesList");
-  
+
   if (!transferButton && !emptySpeciesCard) return;
 
   try {
@@ -653,12 +684,12 @@ async function linkLocation() {
     const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
     const button = document.getElementById("linkBtn");
     const { ebirdData } = await getStorage("ebirdData");
-    
+
     if (!ebirdData?.location) { alert("Keine eBird-Location vorhanden. Bitte zuerst eBird-Daten auslesen."); return; }
-    
+
     const location = ebirdData.location;
     const { locationLinks = {} } = await getStorage("locationLinks");
-    
+
     if (button && button.dataset.mode === "unlink") {
       delete locationLinks[location];
       await setStorage({ locationLinks });
@@ -668,7 +699,7 @@ async function linkLocation() {
       await setStorage({ locationLinks });
       setStatus(`Verknüpfung erstellt: ${location}`);
     }
-    
+
     await updateLinkButton(tab?.url);
     updateOpenLocationButton();
   } catch(error) {
@@ -679,20 +710,60 @@ async function linkLocation() {
 async function updateOpenLocationButton() {
   const openButton = document.getElementById("openLocationBtn");
   const insertButton = document.getElementById("insertBtn");
-  if (!openButton || !insertButton) return;
+  const mapBtnContainer = document.getElementById("ornithoMapBtnContainer");
 
   const { ebirdData, locationLinks = {} } = await getStorage(["ebirdData", "locationLinks"]);
   const hasLink = ebirdData?.location && locationLinks[ebirdData.location];
+  const hasCoordinates = !!ebirdData?.coordinates?.lat && !!ebirdData?.coordinates?.lon;
 
-  openButton.style.display = hasLink ? "block" : "none";
-  insertButton.style.flex = hasLink ? "1" : "1 1 100%";
+  // 1. Unveränderte Logik für Verknüpfungs-Button
+  if (openButton) openButton.style.display = hasLink ? "flex" : "none";
+
+  // 2. Dynamische Erzeugung der Karten-Buttons nach Ländern
+  let matchingCountriesCount = 0;
+
+  if (mapBtnContainer) {
+    mapBtnContainer.innerHTML = "";
+
+    if (hasCoordinates) {
+      const lat = ebirdData.coordinates.lat;
+      const lon = ebirdData.coordinates.lon;
+      const countries = await loadCountryData();
+
+      const matchedCodes = Object.keys(countries).filter(code => {
+        return isPointInCountry(lat, lon, countries[code]);
+      });
+
+      matchedCodes.forEach(code => {
+        const countryInfo = countries[code];
+        const btn = document.createElement("button");
+        btn.className = "ornitho-map-btn";
+        btn.title = `Karte auf ${countryInfo.name} (${code}) öffnen`;
+
+        // Nur das Länderkürzel als Text setzen
+        btn.textContent = code;
+
+        btn.addEventListener("click", () => {
+          const targetUrl = `${countryInfo.url}${lat},${lon}`;
+          chrome.tabs.create({ url: targetUrl });
+        });
+
+        mapBtnContainer.appendChild(btn);
+      });
+    }
+  }
+
+  // Flexbox-Breite des Einfügen-Buttons anpassen
+  if (insertButton) {
+    insertButton.style.flex = (hasLink || matchingCountriesCount > 0) ? "1" : "1 1 100%";
+  }
 }
 
 async function openLocation() {
   const { ebirdData, locationLinks = {} } = await getStorage(["ebirdData", "locationLinks"]);
   const url = locationLinks[ebirdData?.location];
   if (!url) return;
-  
+
   setStatus("Ornitho laden...");
   chrome.tabs.create({ url }, (tab) => {
     chrome.tabs.onUpdated.addListener(function listenForLoad(tabId, changeInfo) {
@@ -717,7 +788,7 @@ async function getAtlasMap(country) {
     const text = await (await fetch(chrome.runtime.getURL("atlascode.csv"))).text();
     const lines = text.split(/\r?\n/).filter(line => line.trim());
     if (!lines.length) return {};
-    
+
     const headers = lines[0].split(";").map(h => h.trim());
     const countryIndex = headers.indexOf(country);
     const ebirdIndex = headers.indexOf("ebirdEU");
@@ -755,7 +826,7 @@ function initActionButtons() {
 }
 
 // ======================================================
-// Teil 7: Initialisierung & Main Loop
+// Teil 8: Initialisierung & Main Loop
 // ======================================================
 
 async function init() {
@@ -770,7 +841,7 @@ async function init() {
 
   hideOpenLocationButton();
   await clearEbirdSessionData();
-  
+
   // Settings & Storage Syncing
   initSettingsMenu();
   await initStrassentaubeSetting();
@@ -779,7 +850,7 @@ async function init() {
   initEbirdSettings();
   initBreedingSetting();
   initCommentsSetting();
-  
+
   // UI Functionalities
   initActionButtons();
   initSpeciesFilter();
@@ -824,7 +895,7 @@ async function init() {
       }
     }, 50);
   });
-  
+
   chrome.windows.onFocusChanged.addListener((windowId) => {
     if (windowId !== chrome.windows.WINDOW_ID_NONE) {
       updateLinkButton();

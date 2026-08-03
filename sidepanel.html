@@ -72,28 +72,49 @@ button {
   background-color: #2b8a3e;
 }
 
+/* Kompakterer Link-Button */
 #openLocationBtn {
-  width: 42px;
-  min-width: 42px;
+  width: 38px; /* Schmaler gemacht (vorher 42px) */
+  min-width: 38px;
   padding: 0;
-  background-color: #69db7c;
+  background-color: #2f9e44;
   color: white;
-  font-size: 18px;
 }
 #openLocationBtn:hover {
-  background-color: #51cf66;
+  background-color: #2b8a3e;
+}
+
+.ornitho-map-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #2f9e44;
+  color: white;
+  min-width: 32px;
+  height: 100%;
+  padding: 1px 8px 0 8px; /* 2px Padding oben schiebt den Text 2px nach unten */  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  transition: background-color 0.2s;
+}
+
+.ornitho-map-btn:hover {
+  background-color: #2b8a3e;
 }
 
 #linkBtn {
-  background-color: #69db7c; /* Hellgrün */
+  background-color: #69db7c;
   color: white;
-  width: 100%;               /* Volle Breite des Containers */
-  padding: 6px 14px;          /* Vertikal schön schmal, horizontal genug Platz */
-  font-size: 13px;            /* Minimal kleinere Schrift für einen dezenteren Look */
-  box-sizing: border-box;     /* Verhindert, dass der Button wegen des Paddings über den Rand steht */
+  width: 100%;
+  padding: 6px 14px;
+  font-size: 13px;
+  box-sizing: border-box;
 }
 #linkBtn:hover {
-  background-color: #51cf66; /* Angenehmer Hover-Effekt */
+  background-color: #51cf66;
 }
 
 #transferSpeciesBtn {
@@ -125,7 +146,7 @@ button {
   border: 1px solid #ccc;
   border-radius: 6px;
   width: 280px;
-  max-height: 600px; /* Erhöht, damit die Library gut Platz findet */
+  max-height: 600px;
   overflow-y: auto;
   padding: 10px;
   position: absolute;
@@ -134,7 +155,6 @@ button {
   display: none;
   z-index: 1000;
   box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-
   white-space: normal;
   overflow-wrap: anywhere;
   word-break: break-word;
@@ -153,31 +173,26 @@ button {
   margin-top: 0;
 }
 
-/* Jedes Einstellungs-Item */
-/* Jedes Einstellungs-Item */
 #settingsMenu label.settings-item {
   display: flex;
-  flex-direction: column;   /* Checkbox+Titel oben, Beschreibung darunter */
-  gap: 2px;                 /* kleiner Abstand zwischen Titel-Row und Beschreibung */
+  flex-direction: column;
+  gap: 2px;
   cursor: pointer;
-  padding: 4px 8px ;         /* etwas Abstand vom Rand des Menüs */
+  padding: 4px 8px;
   box-sizing: border-box;
 }
 
-/* Row für Checkbox + Titel */
 #settingsMenu label.settings-item .checkbox-title-row {
   display: flex;
-  align-items: center;      /* Titel vertikal zur Checkbox zentrieren */
-  gap: 8px;                 /* Abstand Checkbox <-> Titel */
+  align-items: center;
+  gap: 8px;
 }
 
-/* Checkbox */
 #settingsMenu label.settings-item input[type="checkbox"] {
-  margin: 0;                /* keine Verschiebung */
-  flex-shrink: 0;           /* Checkbox bleibt immer gleich groß */
+  margin: 0;
+  flex-shrink: 0;
 }
 
-/* Titel */
 #settingsMenu label.settings-item .settings-title {
   font-weight: 600;
   font-size: 13px;
@@ -185,21 +200,19 @@ button {
 }
 
 #highCountString {
-  font-size: 13px;    /* Etwas größere, gut lesbare Schrift */
-  height: 24px;       /* Gibt der Box eine solide, feste Höhe */
-  padding: 1.5px 6px 1px 6px;   /* Minimaler vertikaler Abstand, damit der Text mittig bleibt */
-  margin-top: 0;      /* Bleibt sauber auf einer Linie mit der Checkbox */
-  flex: 1;            /* Lässt das Input-Feld den restlichen Platz in der Breite nutzen */
+  font-size: 13px;
+  height: 24px;
+  padding: 1.5px 6px 1px 6px;
+  margin-top: 0;
+  flex: 1;
 }
 
-/* Beschreibung */
 #settingsMenu label.settings-item .settings-desc {
   font-size: 12px;
   color: #666;
   line-height: 1.3;
-  margin: 0;                /* bündig links mit Titel */
-  padding-left: calc(8px + 18px - 5px); 
-  /* Erklärung padding-left: Menü-Padding (8px) + Checkbox-Breite (~18px) + gap (8px), damit Text direkt unter Titel beginnt */
+  margin: 0;
+  padding-left: calc(8px + 18px - 5px);
 }
 
 .checkbox-title-row {
@@ -220,7 +233,6 @@ button {
   padding-left: 21px;
 }
 
-/* Library & Inputs Styles */
 .settings-input {
   width: 100%;
   box-sizing: border-box;
@@ -256,9 +268,9 @@ button {
   font-size: 11px;
   border-radius: 4px;
   font-weight: bold;
-  height: 29px;            /* Fixiert die Höhe des Buttons bombenfest */
-  box-sizing: border-box;  /* Verhindert Padding-Verschiebungen */
-  line-height: 17px;       /* Richtet den Text sauber vertikal aus */
+  height: 29px;
+  box-sizing: border-box;
+  line-height: 17px;
 }
 
 .btn-secondary {
@@ -335,18 +347,18 @@ button {
   margin-left: 3px;
 }
 #languageSelect {
-      margin-top: 3px;
-      appearance: none;
-      padding: 6px 28px 6px 10px;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-      font-size: 13px;
-      background-color: #fff;
-      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 20 20'><polygon points='0,0 20,0 10,12' fill='%23666'/></svg>");
-      background-repeat: no-repeat;
-      background-position: right 8px center;
-      cursor: pointer;
-    }
+  margin-top: 3px;
+  appearance: none;
+  padding: 6px 28px 6px 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 13px;
+  background-color: #fff;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 20 20'><polygon points='0,0 20,0 10,12' fill='%23666'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  cursor: pointer;
+}
 
 #languageSelect:focus {
   outline: none;
@@ -471,11 +483,7 @@ body {
 <body>
 
 <header style="position:relative;">
-  <div style="
-    display:flex;
-    justify-content:space-between;
-    align-items:flex-start;
-  ">
+  <div style="display:flex; justify-content:space-between; align-items:flex-start;">
     <div>
       <h1>
         <span style="color:#1c7ed6;">ebird</span><span style="color:#000;">2</span><span style="color:#ff7b00;">ornitho</span>
@@ -485,29 +493,15 @@ body {
       </div>
     </div>
 
-    <div style="
-      display:flex;
-      align-items:center;
-      gap:6px;
-    ">
-      <img id="settingsIcon"
-           src="settings.png"
-           alt="Einstellungen"
-           title="Einstellungen"
-           style="
-             width:18px;
-             height:18px;
-             cursor:pointer;
-           ">
+    <div style="display:flex; align-items:center; gap:6px;">
+      <img id="settingsIcon" src="settings.png" alt="Einstellungen" title="Einstellungen" style="width:18px; height:18px; cursor:pointer;">
     </div>
   </div>
 
   <div id="settingsMenu">
-
-    <!-- Erweiterte Einstellungen -->
     <div class="settings-section-title">Erweiterte Einstellungen</div>
 
-<label class="settings-item">
+    <label class="settings-item">
       <div class="checkbox-title-row">
         <input type="checkbox" id="enableStrassentaube">
         <div class="settings-title">Felsen- immer als Straßentaube erfassen</div>
@@ -527,162 +521,118 @@ body {
       </div>
     </label>
 
-
     <label class="settings-item">
       <div class="checkbox-title-row">
         <input type="checkbox" id="enableHighCountString">
-        <input
-          type="text"
-          id="highCountString"
-          class="settings-input"
-          placeholder="Standard High-Count Text"
-        >
+        <input type="text" id="highCountString" class="settings-input" placeholder="Standard High-Count Text">
       </div>
       <div class="settings-desc">
         Kommentare, die diesen Text enthalten, werden trotz aktiviertem "Kommentare extrahieren" nicht erfasst.
       </div>
     </label>
 
-
-    <!-- Location Library -->
     <div class="settings-section-title">Location Library</div>
-    
+
     <div style="padding: 0 8px; display: flex; flex-direction: column; gap: 4px;">
       <div class="settings-title" style="font-size: 12px; color: #444;">Bestehende Links (Export):</div>
       <textarea id="libExportArea" class="library-box" readonly placeholder="{}"></textarea>
-      
+
       <div class="library-btn-row">
         <button id="libCopyBtn" class="settings-btn btn-secondary" style="width: 100%;">Bibliothek kopieren</button>
       </div>
 
       <div class="settings-title" style="font-size: 12px; color: #444; margin-top: 4px;">Links importieren (JSON):</div>
       <textarea id="libImportArea" class="library-box" placeholder='{"eBird Ort": "Ornitho URL"}'></textarea>
-      
+
       <div class="library-btn-row">
         <button id="libAppendBtn" class="settings-btn btn-success">Anfügen</button>
         <button id="libReplaceBtn" class="settings-btn btn-success" style="background-color: #c92a2a;">Ersetzen</button>
       </div>
     </div>
-
   </div>
-
 </header>
 
 <main>
-
-  <!-- Optionen -->
   <div class="data-card">
-
     <div class="data-item">
       <label>
-        <input type="checkbox"
-               id="includeSubspecies">
+        <input type="checkbox" id="includeSubspecies">
         Unterarten extrahieren
       </label>
     </div>
 
-    <div class="data-item"
-         id="languageRow">
+    <div class="data-item" id="languageRow">
       <span class="label">
         Sprache eBird-Artnamen:
       </span>
 
       <select id="languageSelect">
-        <option value="de">
-          Deutsch
-        </option>
-        <option value="en">
-          Englisch
-        </option>
-        <option value="fr">
-          Französisch
-        </option>
+        <option value="de">Deutsch</option>
+        <option value="en">Englisch</option>
+        <option value="fr">Französisch</option>
       </select>
     </div>
 
     <div class="data-item">
       <label>
-        <input type="checkbox"
-               id="includeComments">
+        <input type="checkbox" id="includeComments">
         Kommentare extrahieren
       </label>
     </div>
 
     <div class="data-item">
       <label>
-        <input type="checkbox"
-               id="enableBreedingCodes">
+        <input type="checkbox" id="enableBreedingCodes">
         Atlas-/Brutzeitcodes extrahieren
       </label>
     </div>
-
   </div>
 
   <button id="extractBtn">
     Daten von eBird erfassen
   </button>
 
-  <!-- Datenanzeige -->
   <div class="data-card">
-
     <div class="data-item">
-      <span class="label">
-        Datum:
-      </span>
-      <span id="dateDisplay">
-        —
-      </span>
+      <span class="label">Ort:</span>
+      <span id="locationDisplay">—</span>
     </div>
 
     <div class="data-item">
-      <span class="label">
-        Zeit:
-      </span>
-      <span id="timeDisplay">
-        —
-      </span>
+      <span class="label">Datum & Zeit:</span>
+      <span id="dateTimeDisplay">—</span>
     </div>
 
-    <div class="data-item"
-         id="commentRow"
-         style="display:none;">
-      <span class="label">
-        Checklisten-Kommentar:
-      </span>
+    <div class="data-item" id="commentRow" style="display:none;">
+      <span class="label">Checklisten-Kommentar:</span>
     </div>
 
-    <div class="comment empty"
-         id="commentText">
+    <div class="comment empty" id="commentText">
       (Kein Checklisten-Kommentar)
     </div>
 
     <div class="data-item">
-      <span class="label">
-        Anzahl Taxa gefunden:
-      </span>
-      <span id="speciesCombined">
-        <span>—</span>
-      </span>
+      <span class="label">Anzahl Taxa gefunden:</span>
+      <span id="speciesCombined"><span>—</span></span>
     </div>
-
   </div>
 
-  <!-- Ornitho Aktionen -->
   <div id="insertButtonsRow">
     <button id="insertBtn">
-      Metadaten in Ornitho einfügen
+      Metadaten einfügen
     </button>
+
+    <!-- Container für dynamische Länder-Karten-Buttons -->
+    <div id="ornithoMapBtnContainer" style="display: flex; gap: 4px;"></div>
 
     <button id="openLocationBtn"
             title="Verknüpfte Ornitho-Seite öffnen"
-            style="display:none; display: flex; align-items: center; justify-content: center;">
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color: white; transform: translateY(+1px) translateX(+1px);">
-        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
-        <polyline points="15 3 21 3 21 9"></polyline>
-        <line x1="10" y1="14" x2="21" y2="3"></line>
-      </svg>
+            style="display:none; align-items: center; justify-content: center;">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color: white;">
+  <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+  <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+</svg>
     </button>
-
   </div>
 
   <button id="linkBtn">
@@ -693,84 +643,33 @@ body {
     Arten in Ornitho einfügen
   </button>
 
-
-  <!-- Leere Arten ausblenden -->
-  <div id="toggleEmptySpeciesCard"
-       style="display:none;">
-
+  <div id="toggleEmptySpeciesCard" style="display:none;">
     <label class="switch">
-
-      <input type="checkbox"
-             id="toggleEmptySpecies">
-
+      <input type="checkbox" id="toggleEmptySpecies">
       <span class="slider round"></span>
-
-      <span class="switch-label">
-        Leere Arten ausblenden
-      </span>
-
+      <span class="switch-label">Leere Arten ausblenden</span>
     </label>
-
   </div>
 
-
-  <!-- Fehlgeschlagene Arten -->
-
-  <div class="data-card"
-       id="failedSpeciesList"
-       style="display:flex;">
-
-    <strong>
-      Manuell einzufügende Arten:
-    </strong>
-
+  <div class="data-card" id="failedSpeciesList" style="display:flex;">
+    <strong>Manuell einzufügende Arten:</strong>
     <div id="failedSpeciesItems"></div>
-
   </div>
 
-
-  <!-- Fehlerhafte Atlascodes -->
-
-  <div class="data-card"
-       id="failedAtlasList"
-       style="display:none;">
-
-    <strong>
-      Manuell einzufügende Atlas-/Brutzeitcodes:
-    </strong>
-
+  <div class="data-card" id="failedAtlasList" style="display:none;">
+    <strong>Manuell einzufügende Atlas-/Brutzeitcodes:</strong>
     <div id="failedAtlasItems"></div>
-
   </div>
-
 </main>
 
-
-
-<!-- Footer -->
 <div id="footer">
-
-  <!-- Hier wird Name und Version via JS eingefügt -->
   <span id="extensionVersion"></span>
-
-  <span>
-    © Florian Hatt
-  </span>
-
-  <a href="https://github.com/FlorianH27/ebird2ornitho/issues"
-     target="_blank"
-     title="Bug melden"
-     id="bugReportFooter">
-
-    <img src="bug.png"
-         alt="Bug melden">
-
+  <span>© Florian Hatt</span>
+  <a href="https://github.com/FlorianH27/ebird2ornitho/issues" target="_blank" title="Bug melden" id="bugReportFooter">
+    <img src="bug.png" alt="Bug melden">
   </a>
-
 </div>
 
-
 <script src="sidepanel.js"></script>
-
 </body>
 </html>

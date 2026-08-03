@@ -1,0 +1,19 @@
+set repoUrl to "https://github.com/FlorianH27/ebird2ornitho/archive/refs/heads/main.zip"
+
+set userChoice to button returned of (display dialog "Möchtest du ebird2ornitho jetzt auf den neuesten Stand von GitHub aktualisieren?" with title "ebird2ornitho Auto-Updater" buttons {"Abbrechen", "Jetzt Aktualisieren"} default button "Jetzt Aktualisieren" cancel button "Abbrechen")
+
+if userChoice is "Jetzt Aktualisieren" then
+	set currentFolder to POSIX path of (path to me)
+	
+	-- Basispfad des Ordners ermitteln
+	set AppleScript's text item delimiters to "/"
+	set pathItems to text items of currentFolder
+	if last item of pathItems is "" then set pathItems to items 1 thru -2 of pathItems
+	if last item of pathItems ends with ".app" then set pathItems to items 1 thru -2 of pathItems
+	set baseFolder to pathItems as text
+	
+	-- Herunterladen, Entpacken und Dateien direkt im Hauptordner überschreiben
+	do shell script "cd " & quoted form of baseFolder & " && curl -sL " & quoted form of repoUrl & " -o latest.zip && unzip -q -o latest.zip -d temp_update && cp -R temp_update/*/* . && rm -rf temp_update latest.zip"
+	
+	display dialog "Update erfolgreich!" & return & return & "Nächster Schritt im Browser:" & return & "1. Browser öffnen" & return & "2. Erweiterungen verwalten" & return & "3. Bei ebird2ornitho auf 'Erneut laden' klicken" with title "ebird2ornitho Auto-Updater" buttons {"OK"} default button "OK"
+end if
