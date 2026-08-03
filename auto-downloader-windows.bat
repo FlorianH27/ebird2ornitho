@@ -10,7 +10,7 @@ Add-Type -AssemblyName PresentationFramework, PresentationCore, WindowsBase
 [xml]$xaml = @"
 <Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="ebird2ornitho Updater" Height="500" Width="800"
+        Title="ebird2ornitho Downloader" Height="500" Width="800"
         WindowStartupLocation="CenterScreen" ResizeMode="NoResize"
         Background="#F4F6F8">
     <Window.Resources>
@@ -80,7 +80,7 @@ Add-Type -AssemblyName PresentationFramework, PresentationCore, WindowsBase
                 </Grid.RowDefinitions>
 
                 <!-- Titel -->
-                <TextBlock Grid.Row="0" Text="ebird2ornitho Auto-Updater" FontSize="26" FontWeight="Bold"
+                <TextBlock Grid.Row="0" Text="ebird2ornitho Auto-Downloader" FontSize="26" FontWeight="Bold"
                            Foreground="#0F172A" HorizontalAlignment="Center" Margin="0,0,0,20"/>
 
                 <!-- Inhaltsbereich -->
@@ -103,7 +103,7 @@ Add-Type -AssemblyName PresentationFramework, PresentationCore, WindowsBase
                     <!-- View: Success -->
                     <StackPanel x:Name="ViewSuccess" Visibility="Collapsed">
                         <Border Background="#DCFCE7" CornerRadius="10" Padding="15" Margin="0,0,0,15">
-                            <TextBlock Text="Update erfolgreich!" FontSize="18" FontWeight="Bold" Foreground="#166534" TextAlignment="Center"/>
+                            <TextBlock Text="Download erfolgreich!" FontSize="18" FontWeight="Bold" Foreground="#166534" TextAlignment="Center"/>
                         </Border>
 
                         <!-- Steps Box -->
@@ -155,7 +155,7 @@ $btnSecondary.Add_Click({
     $window.Close()
 })
 
-# Event: Update Starten
+# Event: Download Starten
 $btnPrimary.Add_Click({
     if ($btnPrimary.Content -eq "Schliessen") {
         $window.Close()
@@ -200,7 +200,7 @@ $btnPrimary.Add_Click({
     }
     catch {
         # Fehlerbehandlung
-        $txtStatus.Text = "Fehler beim Update! Bitte Internetverbindung pruefen."
+        $txtStatus.Text = "Fehler beim Download! Bitte Internetverbindung pruefen."
         $txtStatus.Foreground = [System.Windows.Media.BrushConverter]::new().ConvertFromString("#991B1B")
         $statusBorder.Background = [System.Windows.Media.BrushConverter]::new().ConvertFromString("#FEE2E2")
 
