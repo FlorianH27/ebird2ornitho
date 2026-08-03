@@ -14,7 +14,7 @@
 1. **Lokalen Ordner der Erweiterung öffnen**  
    *(Falls der Speicherort unbekannt ist: Im Browser unter **Erweiterungen** → **Erweiterungen verwalten** bei ebird2ornitho auf **Details** klicken und den Dateipfad neben **Geladen aus** ablesen)*
 2. **Auto-Downloader öffnen**
-   * **Windows:** Doppelklick auf `auto-downloader-windows.hta`
+   * **Windows:** Doppelklick auf `auto-downloader-windows.bat`
    * **macOS:** Doppelklick auf `auto-downloader-macOS.app`  
      *(Hinweis macOS: Falls die App fehlt, muss sie einmalig erstellt werden – siehe [Anleitung für macOS](#anleitung-auto-downloader-app-für-macos-erstellen))*
 3. **Erweiterung neu laden**  
