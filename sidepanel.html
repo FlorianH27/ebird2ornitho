@@ -568,8 +568,26 @@ button {
   height: 12px;
 }
 
-body {
-  padding-bottom: 28px;
+.external-link-icon {
+  display: inline-flex;
+  align-items: baseline;
+  margin-left: 4px;
+  color: #818080;
+  text-decoration: none;
+  transform: translate(-2px, 0.8px); /* Hier nach Belieben anpassen, z.B. translate(1px, -2px) */
+}
+
+.external-link-icon {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 4px;
+  color: #000;
+  text-decoration: none;
+  vertical-align: baseline;
+}
+
+.external-link-icon:hover {
+  color: #1c7ed6;
 }
 </style>
 </head>
@@ -605,15 +623,22 @@ body {
       </div>
     </label>
 
-    <label class="settings-item">
-      <div class="checkbox-title-row">
-        <input type="checkbox" id="useAtlasCodesCT">
-        <div class="settings-title">Brutzeitcodes C und T übernehmen</div>
-      </div>
-      <div class="settings-desc">
-        Je nach Ornitho-Portal sollte diese Option nur aktiviert sein, wenn die Codes für das Verhalten von PAAREN verwendet werden.
-      </div>
-    </label>
+<label class="settings-item">
+  <div class="checkbox-title-row">
+    <input type="checkbox" id="useAtlasCodesCT">
+    <div class="settings-title">
+      Brutzeitcodes C und T übernehmen
+      <a href="https://support.ebird.org/de/support/solutions/articles/48000837520-brutzeit-und-verhaltenscodes-in-ebird#anchorDefinitions" target="_blank" title="Definitionen ansehen" class="external-link-icon">
+        <svg viewBox="0 0 24 24" width="11" height="11">
+          <path fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14L21 3"/>
+        </svg>
+      </a>
+    </div>
+  </div>
+  <div class="settings-desc">
+    Je nach Ornitho-Portal sollte diese Option nur aktiviert sein, wenn die Codes für das Verhalten von PAAREN verwendet werden.
+  </div>
+</label>
 
     <label class="settings-item">
       <div class="checkbox-title-row">
