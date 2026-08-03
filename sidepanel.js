@@ -336,25 +336,24 @@ async function lockUI(remoteVersion) {
       <h2 style="margin-top: 0; font-size: 20px; color: #0f172a;">Version ${remoteVersion} verfügbar</h2>
 
       <div style="background: #eef6ff; border: 1px solid #3b82f6; border-radius: 8px; padding: 14px; margin: 16px 0; text-align: left;">
-        <strong style="font-size: 13px; color: #1d4ed8; display: block; margin-bottom: 8px;">Update-Schritte:</strong>
+        <strong style="font-size: 13px; color: #1d4ed8; display: block; margin-bottom: 8px;">Anleitung Update:</strong>
 
         <ol style="font-size: 12px; color: #1e293b; margin: 0; padding-left: 18px; line-height: 1.5;">
           <li>
             <b>Lokalen Ordner der Erweiterung öffnen</b><br>
             <span style="font-size: 11px; color: #475569;">
                Lokalen Ordner öffnen, in dem die Erweiterung gespeichert wurde. Falls der Speicherort unbekannt ist, bei
-                <button id="openDetailsBtn" style="background: none; border: none; padding: 0; color: #2563eb; text-decoration: underline; cursor: pointer; font-size: 11px;">Details</button>
-                   neben <b>Geladen aus</b> den Dateipfad nachschauen.
+<button id="openDetailsBtn" style="display: inline; width: auto; background: none; border: none; padding: 0; color: #2563eb; text-decoration: underline; cursor: pointer; font-size: 11px; vertical-align: baseline;">Details</button>                   neben <b>Geladen aus</b> den Dateipfad nachschauen.
             </span>
           </li>
           <li style="margin-top: 6px;">
-            <b>Im lokalen Ordner den Updater öffnen</b>
+            <b>Im lokalen Ordner den Downloader öffnen</b>
             <ul style="margin: 2px 0 0 0; padding-left: 16px; font-size: 11px;">
               <li><b>Windows:</b> <code>auto-downloader-windows.hta</code></li>
               <li>
                 <b>macOS:</b> <code>auto-downloader-macOS.app</code><br>
                 <span style="font-size: 10px; color: #64748b;">
-                  (<b>Hinweis macOS:</b> Falls auto-downloader-macOS.app fehlt, muss dieser einmalig selbst erstellt werden – <a href="https://github.com/FlorianH27/ebird2ornitho/blob/main/README.md#anleitung-auto-updater-app-f%C3%BCr-macos-erstellen" target="_blank" style="color: #2563eb;">Anleitung</a>)
+                  (<b>Hinweis macOS:</b> Falls auto-downloader-macOS.app fehlt, muss dieser einmalig selbst erstellt werden – <a href="https://github.com/FlorianH27/ebird2ornitho/blob/main/README.md#anleitung-auto-downloader-app-f%C3%BCr-macos-erstellen" target="_blank" style="color: #2563eb;">Anleitung</a>)
                 </span>
               </li>
             </ul>
@@ -362,15 +361,20 @@ async function lockUI(remoteVersion) {
           <li style="margin-top: 6px;">
             <b>Erweiterung neu laden</b><br>
             <span style="font-size: 11px; color: #475569;">
-              <button id="openExtPageBtn" style="background: none; border: none; padding: 0; color: #2563eb; text-decoration: underline; cursor: pointer; font-size: 11px;">Erweiterungen verwalten</button>
-              → bei ebird2ornitho auf <b>Erneut laden</b> (Kreis-Symbol) klicken
+<button id="openExtPageBtn" style="display: inline; width: auto; background: none; border: none; padding: 0; color: #2563eb; text-decoration: underline; cursor: pointer; font-size: 11px; vertical-align: baseline;">Erweiterungen verwalten</button>              → bei ebird2ornitho auf <b>Erneut laden</b> (Kreis-Symbol) klicken
             </span>
           </li>
         </ol>
       </div>
 
+
+      <a href="https://github.com/FlorianH27/ebird2ornitho/blob/main/README.md#update" target="_blank" style="font-size: 12px; text-decoration: underline;">
+        Anleitung online öffnen
+      </a>
+
+
       <div style="background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; padding: 12px; margin: 16px 0; text-align: left;">
-        <span style="font-size: 12px; font-weight: bold; color: #000; display: block; margin-bottom: 4px;">Location Library Backup:</span>
+        <span style="font-size: 12px; font-weight: bold; color: #000; display: block; margin-bottom: 4px;">Optional: Location Library Backup</span>
         <span style="font-size: 11px; color: #475569; display: block; margin-bottom: 8px;">
           Alle Daten bleiben beim Update erhalten. Optional kann die Location-Library kopiert und nach dem Update in den Einstellungen wieder eingefügt werden:
         </span>
@@ -378,10 +382,6 @@ async function lockUI(remoteVersion) {
           Library in Zwischenablage kopieren
         </button>
       </div>
-
-      <a href="https://github.com/FlorianH27/ebird2ornitho/blob/main/README.md#update" target="_blank" style="font-size: 12px; color: #64748b; text-decoration: underline;">
-        Anleitung online öffnen
-      </a>
 
       ${remaining > 0 ? `
         <div style="margin-top: 20px; border-top: 1px solid #f1f5f9; padding-top: 14px;">
