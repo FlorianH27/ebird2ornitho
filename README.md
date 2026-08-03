@@ -13,7 +13,7 @@
 ### Empfohlen: Auto-Updater nutzen
 1. **Lokalen Ordner der Erweiterung öffnen**  
    *(Falls der Speicherort unbekannt ist: Im Browser unter **Erweiterungen** → **Erweiterungen verwalten** bei ebird2ornitho auf **Details** klicken und den Dateipfad neben **Geladen aus** ablesen)*
-2. **Auto-Updater starten**
+2. **Auto-Updater öffnen**
    * **Windows:** Doppelklick auf `auto-updater-windows.hta`
    * **macOS:** Doppelklick auf `auto-updater-macOS.app`  
      *(Hinweis macOS: Falls die App fehlt, muss sie einmalig erstellt werden – siehe [Anleitung für macOS](#anleitung-auto-updater-app-für-macos-erstellen))*
