@@ -615,10 +615,16 @@ let countryDataCache = null;
 async function loadCountryData() {
   if (countryDataCache) return countryDataCache;
   try {
-    const response = await fetch(chrome.runtime.getURL("country_polygons.json"));
+    const rawGithubUrl = "https://raw.githubusercontent.com/FlorianH27/ebird2ornitho/main/country_polygons.json";
+    const response = await fetch(rawGithubUrl);
+
+    if (!response.ok) {
+      throw new Error(`HTTP Error: ${response.status}`);
+    }
+
     countryDataCache = await response.json();
   } catch (e) {
-    console.error("Fehler beim Laden der Länder-Polygone:", e);
+    console.error("Fehler beim Laden der Länder-Polygone von GitHub:", e);
     countryDataCache = {};
   }
   return countryDataCache;
