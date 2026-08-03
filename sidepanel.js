@@ -278,6 +278,23 @@ libReplaceBtn?.addEventListener("click", () => {
   }
 });
 
+document.getElementById("extensionsLinkBtn")?.addEventListener("click", () => {
+  let url = "chrome://extensions";
+  if (navigator.userAgent.indexOf("Edg") > -1) {
+    url = "edge://extensions";
+  }
+
+  if (typeof chrome !== "undefined" && chrome.tabs && chrome.tabs.create) {
+    try {
+      chrome.tabs.create({ url: url });
+    } catch (err) {
+      window.open(url);
+    }
+  } else {
+    window.open(url);
+  }
+});
+
 // ======================================================
 // Teil 4: Update Handling & UI Lock
 // ======================================================
@@ -491,8 +508,6 @@ function showData(data) {
   const debug = document.getElementById("speciesDebug");
   if (debug) debug.textContent = JSON.stringify(speciesList, null, 2);
 }
-
-
 
 let speciesMap = null;
 async function loadSpeciesMap() {
