@@ -74,7 +74,7 @@ button {
 
 /* Kompakterer Link-Button */
 #openLocationBtn {
-  width: 38px; /* Schmaler gemacht (vorher 42px) */
+  width: 38px;
   min-width: 38px;
   padding: 0;
   background-color: #2f9e44;
@@ -92,7 +92,8 @@ button {
   color: white;
   min-width: 32px;
   height: 100%;
-  padding: 1px 8px 0 8px; /* 2px Padding oben schiebt den Text 2px nach unten */  border-radius: 6px;
+  padding: 1px 8px 0 8px;
+  border-radius: 6px;
   border: none;
   cursor: pointer;
   font-size: 11px;
@@ -305,13 +306,20 @@ button {
 .data-item {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
+  gap: 12px;
   font-size: 14px;
+}
+
+.data-item .value {
+  text-align: right;
+  word-break: break-word;
 }
 
 .label {
   font-weight: 600;
   color: #ff7b00;
+  white-space: nowrap;
 }
 
 .comment {
@@ -595,12 +603,12 @@ body {
   <div class="data-card">
     <div class="data-item">
       <span class="label">Ort:</span>
-      <span id="locationDisplay">—</span>
+      <span id="locationDisplay" class="value">—</span>
     </div>
 
     <div class="data-item">
       <span class="label">Datum & Zeit:</span>
-      <span id="dateTimeDisplay">—</span>
+      <span id="dateTimeDisplay" class="value">—</span>
     </div>
 
     <div class="data-item" id="commentRow" style="display:none;">
@@ -613,7 +621,7 @@ body {
 
     <div class="data-item">
       <span class="label">Anzahl Taxa gefunden:</span>
-      <span id="speciesCombined"><span>—</span></span>
+      <span id="speciesCombined" class="value"><span>—</span></span>
     </div>
   </div>
 
