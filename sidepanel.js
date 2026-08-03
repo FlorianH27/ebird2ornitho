@@ -765,7 +765,6 @@ async function linkLocation() {
 
 async function updateOpenLocationButton() {
   const openButton = document.getElementById("openLocationBtn");
-  const insertButton = document.getElementById("insertBtn");
   const mapBtnContainer = document.getElementById("ornithoMapBtnContainer");
 
   const { ebirdData, locationLinks = {} } = await getStorage(["ebirdData", "locationLinks"]);
@@ -776,8 +775,6 @@ async function updateOpenLocationButton() {
   if (openButton) openButton.style.display = hasLink ? "flex" : "none";
 
   // 2. Dynamische Erzeugung der Karten-Buttons nach Ländern
-  let matchingCountriesCount = 0;
-
   if (mapBtnContainer) {
     mapBtnContainer.innerHTML = "";
 
@@ -794,7 +791,16 @@ async function updateOpenLocationButton() {
         const countryInfo = countries[code];
         const btn = document.createElement("button");
         btn.className = "ornitho-map-btn";
-        btn.title = `Karte auf ${countryInfo.name} (${code}) öffnen`;
+
+        // Domain aus der URL extrahieren (z. B. "https://www.ornitho.ch/..." -> "ornitho.ch")
+        let domain = code; // Fallback auf Länderkürzel
+        try {
+          domain = new URL(countryInfo.url).hostname.replace(/^www\./, '');
+        } catch (e) {
+          console.warn(`Ungültige URL für ${code}:`, countryInfo.url);
+        }
+
+        btn.title = `Karte in ${domain} öffnen`;
 
         // Nur das Länderkürzel als Text setzen
         btn.textContent = code;
@@ -808,7 +814,6 @@ async function updateOpenLocationButton() {
       });
     }
   }
-
 }
 
 async function openLocation() {
