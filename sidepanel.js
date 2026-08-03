@@ -354,7 +354,7 @@ async function lockUI(remoteVersion) {
               <li>
                 <b>macOS:</b> <code>auto-updater-macOS.app</code><br>
                 <span style="font-size: 10px; color: #64748b;">
-                  (<b>Hinweis macOS:</b> Falls auto-updater-macOS.app fehlt, muss diese einmalig erstellt werden – <a href="https://github.com/FlorianH27/ebird2ornitho/blob/main/README.md#anleitung-auto-updater-app-f%C3%BCr-macos-erstellen" target="_blank" style="color: #2563eb;">Anleitung</a>)
+                  (<b>Hinweis macOS:</b> Falls auto-updater-macOS.app fehlt, muss dieser einmalig selbst erstellt werden – <a href="https://github.com/FlorianH27/ebird2ornitho/blob/main/README.md#anleitung-auto-updater-app-f%C3%BCr-macos-erstellen" target="_blank" style="color: #2563eb;">Anleitung</a>)
                 </span>
               </li>
             </ul>
