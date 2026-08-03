@@ -332,27 +332,60 @@ async function lockUI(remoteVersion) {
   overlay.style = "position:fixed; inset:0; background:rgba(255,255,255,0.98); z-index:9999; display:flex; align-items:center; justify-content:center; text-align:center; padding:20px; font-family:sans-serif;";
 
   overlay.innerHTML = `
-    <div style="max-width: 400px; background: #fff; padding: 24px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.15);">
-      <h2 style="margin-top: 0;">Version ${remoteVersion} verfügbar</h2>
-      <a href="https://github.com/FlorianH27/ebird2ornitho/releases/latest" target="_blank"
-         style="display: block; background: #1c7ed6; color: #fff; text-decoration: none; padding: 12px; border-radius: 6px; font-weight: bold; font-size: 15px; margin: 16px 0;">
-        Source Code (zip) herunterladen
-      </a>
-      <div style="background: #E3E3E3; border: 1px solid #6B6B6B; border-radius: 6px; padding: 12px; margin: 16px 0; text-align: left;">
+    <div style="max-width: 420px; background: #fff; padding: 24px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.15);">
+      <h2 style="margin-top: 0; font-size: 20px; color: #0f172a;">Version ${remoteVersion} verfügbar</h2>
+
+      <div style="background: #eef6ff; border: 1px solid #3b82f6; border-radius: 8px; padding: 14px; margin: 16px 0; text-align: left;">
+        <strong style="font-size: 13px; color: #1d4ed8; display: block; margin-bottom: 8px;">Update-Schritte:</strong>
+
+        <ol style="font-size: 12px; color: #1e293b; margin: 0; padding-left: 18px; line-height: 1.5;">
+          <li>
+            <b>Lokalen Ordner der Erweiterung öffnen</b><br>
+            <span style="font-size: 11px; color: #475569;">
+               Lokalen Ordner öffnen, in dem die Erweiterung gespeichert wurde. Falls der Speicherort unbekannt ist, bei
+                <button id="openDetailsBtn" style="background: none; border: none; padding: 0; color: #2563eb; text-decoration: underline; cursor: pointer; font-size: 11px;">Details</button>
+                   neben <b>Geladen aus</b> den Dateipfad nachschauen.
+            </span>
+          </li>
+          <li style="margin-top: 6px;">
+            <b>Im lokalen Ordner den Updater öffnen</b>
+            <ul style="margin: 2px 0 0 0; padding-left: 16px; font-size: 11px;">
+              <li><b>Windows:</b> <code>auto-updater-windows.hta</code></li>
+              <li>
+                <b>macOS:</b> <code>auto-updater-macOS.app</code><br>
+                <span style="font-size: 10px; color: #64748b;">
+                  (<b>Hinweis macOS:</b> Falls auto-updater-macOS.app fehlt, muss diese einmalig erstellt werden – <a href="https://github.com/FlorianH27/ebird2ornitho/blob/main/README.md#anleitung-auto-updater-app-f%C3%BCr-macos-erstellen" target="_blank" style="color: #2563eb;">Anleitung</a>)
+                </span>
+              </li>
+            </ul>
+          </li>
+          <li style="margin-top: 6px;">
+            <b>Erweiterung neu laden</b><br>
+            <span style="font-size: 11px; color: #475569;">
+              <button id="openExtPageBtn" style="background: none; border: none; padding: 0; color: #2563eb; text-decoration: underline; cursor: pointer; font-size: 11px;">Erweiterungen verwalten</button>
+              → bei ebird2ornitho auf <b>Erneut laden</b> (Kreis-Symbol) klicken
+            </span>
+          </li>
+        </ol>
+      </div>
+
+      <div style="background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; padding: 12px; margin: 16px 0; text-align: left;">
         <span style="font-size: 12px; font-weight: bold; color: #000; display: block; margin-bottom: 4px;">Location Library Backup:</span>
-        <span style="font-size: 12px; color: #000; display: block; margin-bottom: 8px;">
-          Beim Befolgen der Update-Anleitung bleibt die Location Library erhalten. Zur Sicherheit kann hier dennoch die Library kopiert werden.
+        <span style="font-size: 11px; color: #475569; display: block; margin-bottom: 8px;">
+          Alle Daten bleiben beim Update erhalten. Optional kann die Location-Library kopiert und nach dem Update in den Einstellungen wieder eingefügt werden:
         </span>
-        <button id="copyLocationBtn" style="background: #f1f3f5; color: #495057; border: 1px solid #ced4da; padding: 6px 10px; font-size: 11px; border-radius: 4px; width: 100%; cursor: pointer;">
-          Bibliothek in Zwischenablage kopieren
+        <button id="copyLocationBtn" style="background: #ffffff; color: #334155; border: 1px solid #cbd5e1; padding: 6px 10px; font-size: 11px; font-weight: 600; border-radius: 4px; width: 100%; cursor: pointer;">
+          Library in Zwischenablage kopieren
         </button>
       </div>
-      <a href="https://github.com/FlorianH27/ebird2ornitho/blob/main/README.md#update" target="_blank" style="font-size: 13px; color: #666; text-decoration: underline;">
-        Anleitung Updates
+
+      <a href="https://github.com/FlorianH27/ebird2ornitho/blob/main/README.md#update" target="_blank" style="font-size: 12px; color: #64748b; text-decoration: underline;">
+        Anleitung online öffnen
       </a>
+
       ${remaining > 0 ? `
-        <div style="margin-top: 24px; border-top: 1px solid #eee; padding-top: 16px;">
-          <button id="unlockOnceBtn" style="background: transparent; color: #868e96; border: 1px solid #dee2e6; padding: 8px 12px; font-size: 13px; border-radius: 6px;">
+        <div style="margin-top: 20px; border-top: 1px solid #f1f5f9; padding-top: 14px;">
+          <button id="unlockOnceBtn" style="background: transparent; color: #94a3b8; border: 1px solid #e2e8f0; padding: 8px 12px; font-size: 12px; border-radius: 6px; cursor: pointer;">
             Update überspringen
           </button>
         </div>
@@ -361,6 +394,22 @@ async function lockUI(remoteVersion) {
   `;
   document.body.appendChild(overlay);
 
+  // Link 1: Details öffnen
+  document.getElementById("openDetailsBtn").addEventListener("click", () => {
+    const extId = chrome.runtime.id;
+    try {
+      chrome.tabs.create({ url: `chrome://extensions/?id=${extId}` });
+    } catch (err) {
+      chrome.tabs.create({ url: "chrome://extensions" });
+    }
+  });
+
+  // Link 2: Erweiterungen verwalten öffnen
+  document.getElementById("openExtPageBtn").addEventListener("click", () => {
+    chrome.tabs.create({ url: "chrome://extensions" });
+  });
+
+  // Location Backup kopieren
   document.getElementById("copyLocationBtn").addEventListener("click", async (e) => {
     e.preventDefault();
     const btn = e.target;
@@ -369,15 +418,16 @@ async function lockUI(remoteVersion) {
       const locationString = data.locationLinks ? JSON.stringify(data.locationLinks, null, 2) : "Keine Location-Links im Speicher gefunden.";
       await navigator.clipboard.writeText(locationString);
 
-      btn.style.background = "#f4fce3"; btn.style.color = "#2b8a3e"; btn.style.borderColor = "#b2f2bb"; btn.textContent = "Kopiert!";
+      btn.style.background = "#dcfce7"; btn.style.color = "#166534"; btn.style.borderColor = "#86efac"; btn.textContent = "Kopiert!";
       setTimeout(() => {
-        btn.style.background = "#fff"; btn.style.color = "#495057"; btn.style.borderColor = "#ced4da"; btn.textContent = "In Zwischenablage kopieren";
+        btn.style.background = "#ffffff"; btn.style.color = "#334155"; btn.style.borderColor = "#cbd5e1"; btn.textContent = "Bibliothek in Zwischenablage kopieren";
       }, 2000);
     } catch (err) {
       btn.textContent = "Fehler beim Kopieren";
     }
   });
 
+  // Unlock Button
   if (remaining > 0) {
     document.getElementById("unlockOnceBtn").addEventListener("click", async () => {
       await chrome.storage.local.set({ unlockAttempts: unlockAttempts + 1 });
