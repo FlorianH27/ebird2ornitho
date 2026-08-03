@@ -3,5 +3,5 @@
 cd "$(dirname "$0")"
 
 # Rechte zur Ausfuehrung sicherstellen & Skript starten
-chmod +x update.sh
+chmod +x raw-downloader-macOS.sh
 ./update.sh
