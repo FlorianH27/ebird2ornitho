@@ -47,17 +47,20 @@ Falls der Auto-Updater nicht ausgeführt werden kann, lässt sich das Update auc
 8. Im Sidepanel auf "Arten in Ornitho einfügen" klicken
 9. Wie gewohnt speichern → fertig!
 
----
 
 ## Anleitung Auto-Updater App für macOS erstellen
 
-Da macOS das Ausführen unsignierter Updater aus Sicherheitsgründen einschränkt, kann der Auto-Updater auf dem Mac einmalig über den integrierten **Skript-Editor** als `.app` gespeichert werden:
+Da macOS das Ausführen unsignierter Updater aus Sicherheitsgründen einschränkt, muss der Auto-Updater für macOS einmalig selbst erstellt werden:
 
 1. Auf dem Mac die App **Skript-Editor** (Script Editor) öffnen (zu finden über die Spotlight-Suche mit `Cmd + Leertaste`).
-2. Die Datei `auto-updater-macOS.applescript` aus dem ebird2ornitho-Ordner im Skript-Editor öffnen (oder den Inhalt hineinkopieren).
-3. Im Menü oben auf **Ablage** → **Exportieren...** klicken.
-4. Folgende Einstellungen wählen:
+2. "Neues Dokument" anklicken
+3. Den Inhalt der Datei <a href="https://github.com/FlorianH27/ebird2ornitho/blob/main/auto-update-raw-macOS.txt" target="_blank"><code>auto-update-raw-macOS.txt</code></a> in das neue leere Dokument einfügen.
+4. Im Menü oben auf **Ablage** → **Exportieren...** klicken.
+5. Folgende Einstellungen wählen:
    * **Exportieren als:** `auto-updater-macOS`
-   * **Ort:** Direkt im ebird2ornitho-Ordner speichern
-   * **Dateiformat:** **Programm** (Application)
-5. Auf **Sichern** klicken. Die erstellte `auto-updater-macOS.app` kann ab sofort für zukünftige Updates per Doppelklick genutzt werden.
+   * **Ort:** Eigenen ebird2ornitho-Ordner auswählen
+   * **Dateiformat:** **App** (Program)
+   * **Optionen:** Alle deaktivieren
+   * **Codesignatur:** **Zum lokalen ausführen signieren**
+6. Auf **Sichern** klicken. Die erstellte `auto-updater-macOS.app` kann ab sofort für den Download von Updates per Doppelklick genutzt werden.
+7. Der Skript-Editor kann ohne weitere Dokumente zu speichern wieder geschlossen werden.
