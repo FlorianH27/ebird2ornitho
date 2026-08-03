@@ -333,7 +333,11 @@ async function lockUI(remoteVersion) {
 
   overlay.innerHTML = `
     <div style="max-width: 420px; background: #fff; padding: 24px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.15);">
-      <h2 style="margin-top: 0; font-size: 20px; color: #0f172a;">Version ${remoteVersion} verfügbar</h2>
+      <h2 style="margin-top: 0; margin-bottom: 4px; font-size: 20px; color: #0f172a;">Version ${remoteVersion} verfügbar</h2>
+
+      <a href="https://github.com/FlorianH27/ebird2ornitho/releases/latest" target="_blank" style="display: inline-block; font-size: 11px; color: #2563eb; text-decoration: none; font-weight: 500; margin-bottom: 12px;">
+        Änderungsprotokoll (Changelog) ansehen &rarr;
+      </a>
 
       <div style="background: #eef6ff; border: 1px solid #3b82f6; border-radius: 8px; padding: 14px; margin: 16px 0; text-align: left;">
         <strong style="font-size: 13px; color: #1d4ed8; display: block; margin-bottom: 8px;">Anleitung Update:</strong>
@@ -367,11 +371,9 @@ async function lockUI(remoteVersion) {
         </ol>
       </div>
 
-
       <a href="https://github.com/FlorianH27/ebird2ornitho/blob/main/README.md#update" target="_blank" style="font-size: 12px; text-decoration: underline;">
         Anleitung online öffnen
       </a>
-
 
       <div style="background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; padding: 12px; margin: 16px 0; text-align: left;">
         <span style="font-size: 12px; font-weight: bold; color: #000; display: block; margin-bottom: 4px;">Optional: Location Library Backup</span>
@@ -436,6 +438,7 @@ async function lockUI(remoteVersion) {
     });
   }
 }
+
 
 // ======================================================
 // Teil 5: Datenanzeige, Extraktion & Mapping
