@@ -353,7 +353,7 @@ async function lockUI(remoteVersion) {
           <li style="margin-top: 6px;">
             <b>Im lokalen Ordner den Downloader öffnen</b>
             <ul style="margin: 2px 0 0 0; padding-left: 16px; font-size: 11px;">
-              <li><b>Windows:</b> <code>auto-downloader-windows.hta</code></li>
+              <li><b>Windows:</b> <code>auto-downloader-windows.bat</code></li>
               <li>
                 <b>macOS:</b> <code>auto-downloader-macOS.app</code><br>
                 <span style="font-size: 10px; color: #64748b;">
