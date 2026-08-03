@@ -845,7 +845,7 @@ async function openLocation() {
 
 async function getAtlasMap(country) {
   try {
-    const text = await (await fetch(chrome.runtime.getURL("atlascode.csv"))).text();
+    const text = await (await fetch(chrome.runtime.getURL("breedingcode.csv"))).text();
     const lines = text.split(/\r?\n/).filter(line => line.trim());
     if (!lines.length) return {};
 
