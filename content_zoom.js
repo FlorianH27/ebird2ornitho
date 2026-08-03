@@ -34,7 +34,7 @@ function checkUrlZoom() {
         // Zoom-Funktion definieren
         const applyZoom = () => {
             if (window.openlayerMap?.setCenter) {
-                window.openlayerMap.setCenter(lat - 0.002, lon, -1, false);
+                window.openlayerMap.setCenter(lat, lon, -1, false);
                 window.scrollTo({ top: 360 });
             }
         };

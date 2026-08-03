@@ -809,10 +809,6 @@ async function updateOpenLocationButton() {
     }
   }
 
-  // Flexbox-Breite des Einfügen-Buttons anpassen
-  if (insertButton) {
-    insertButton.style.flex = (hasLink || matchingCountriesCount > 0) ? "1" : "1 1 100%";
-  }
 }
 
 async function openLocation() {
