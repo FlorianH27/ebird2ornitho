@@ -3,31 +3,61 @@
 ## Installation 
 (Auf Microsoft Edge, Google Chrome und Ecosia erfolgreich getestet, funktioniert NICHT auf Firefox oder Safari)
 
-1. ZIP herunterladen (https://github.com/FlorianH27/ebird2ornitho/releases)
-2. ZIP extrahieren und in beliebigem Ordner abspeichern
+1. Source code (zip) herunterladen (https://github.com/FlorianH27/ebird2ornitho/releases)
+2. zip-Ordner extrahieren und in einem beliebigen Ordner abspeichern
 3. Browser → Erweiterungen → Erweiterungen verwalten → Entwicklermodus aktivieren → Entpackte Dateien laden → Ordner auswählen → fertig
 4. Optional: Kann im Browser für schnelleren Zugriff an Symbolleiste gepinnt werden
 
 ## Update
-Um die bisherigen Einstellungen sowie die Location Library beizubehalten, folgende Anleitung beachten:
-1. ZIP herunterladen (https://github.com/FlorianH27/ebird2ornitho/releases)
-2. ZIP extrahieren
-3. Alle Dateien des extrahierten Ordners kopieren
-4. Speicherort der alten Dateien öffnen
-5. Alte Dateien löschen und neue am selben Ort einfügen
-6. Browser → Erweiterungen → Erweiterungen verwalten → ebird2ornitho → "Erneut laden"
 
-Zur Sicherheit kann die Location Library vor dem Update kopiert werden und anschliessend im Einstellungs Menu wieder importiert werden.
+### Empfohlen: Auto-Updater nutzen
+1. **Lokalen Ordner der Erweiterung öffnen**  
+   *(Falls der Speicherort unbekannt ist: Im Browser unter **Erweiterungen** → **Erweiterungen verwalten** bei ebird2ornitho auf **Details** klicken und den Dateipfad neben **Geladen aus** ablesen)*
+2. **Auto-Updater starten**
+   * **Windows:** Doppelklick auf `auto-updater-windows.hta`
+   * **macOS:** Doppelklick auf `auto-updater-macOS.app`  
+     *(Hinweis macOS: Falls die App fehlt, muss sie einmalig erstellt werden – siehe [Anleitung für macOS](#anleitung-auto-updater-app-für-macos-erstellen))*
+3. **Erweiterung neu laden**  
+   Browser → **Erweiterungen** → **Erweiterungen verwalten** → bei ebird2ornitho auf **Erneut laden** (Kreis-Symbol) klicken
 
-## Kurzanleitung
-eBird:
-1. ebird Checkliste in eigenem Tab öffnen
+
+### Alternative: Manuelles Update
+Falls der Auto-Updater nicht ausgeführt werden kann, lässt sich das Update auch manuell durchführen:
+1. Source code (zip) herunterladen (https://github.com/FlorianH27/ebird2ornitho/releases)
+2. zip-Ordner extrahieren
+3. Alle Dateien aus dem neu extrahierten Ordner kopieren
+4. Speicherort der alten Erweiterungs-Dateien öffnen  
+   *(Falls der Speicherort unbekannt ist: Im Browser unter **Erweiterungen** → **Erweiterungen verwalten** bei ebird2ornitho auf **Details** klicken und den Dateipfad neben **Geladen aus** ablesen)*
+5. Alte Dateien durch die neuen Dateien ersetzen
+6. Browser → Erweiterungen → Erweiterungen verwalten → bei ebird2ornitho auf **Erneut laden** (Kreis-Symbol) klicken
+
+*Hinweis: Alle Daten (inkl. Location Library) bleiben bei beiden Update-Methoden erhalten. Optional kann die Location Library vor dem Update in den Einstellungen der Erweiterung kopiert und anschliessend wieder eingefügt werden.*
+
+## Bedienungsanleitung
+
+1. eBird Checkliste in eigenem Tab öffnen
 2. ebird2ornitho Erweiterung öffnen
-3. Klick auf "Daten von eBird erfassen" um Daten auszulesen
+3. Im Sidepanel auf "Daten von eBird erfassen" klicken, um Daten auszulesen
+4. Ornitho manuell bedienen bis Ort auf Karte ausgewählt werden muss  
+   **ODER**  
+   Karte direkt per Button aus dem Sidepanel heraus öffnen
+5. Wie gewohnt Ort auswählen auf Ornitho
+6. Falls Metadaten noch nicht eingefügt, im Sidepanel auf "Metadaten einfügen" klicken
+7. Wie gewohnt speichern und warten bis das Listen-Template geladen wurde
+8. Im Sidepanel auf "Arten in Ornitho einfügen" klicken
+9. Wie gewohnt speichern → fertig!
 
-Ornitho:
-1. Ornitho manuell bedienen bis Metadaten eingegeben werden (ggf. zuvor "Auf eBird Location zoomen" verwenden) 
-2. Klick auf "Metadaten in Ornitho einfügen"
-3. Liste wie gewohnt speichern und warten bis leeres Listen Template geladen ist
-4. Klick auf "Arten in Ornitho einfügen"
-5. Wie gewohnt speichern → fertig!
+---
+
+## Anleitung Auto-Updater App für macOS erstellen
+
+Da macOS das Ausführen unsignierter Updater aus Sicherheitsgründen einschränkt, kann der Auto-Updater auf dem Mac einmalig über den integrierten **Skript-Editor** als `.app` gespeichert werden:
+
+1. Auf dem Mac die App **Skript-Editor** (Script Editor) öffnen (zu finden über die Spotlight-Suche mit `Cmd + Leertaste`).
+2. Die Datei `auto-updater-macOS.applescript` aus dem ebird2ornitho-Ordner im Skript-Editor öffnen (oder den Inhalt hineinkopieren).
+3. Im Menü oben auf **Ablage** → **Exportieren...** klicken.
+4. Folgende Einstellungen wählen:
+   * **Exportieren als:** `auto-updater-macOS`
+   * **Ort:** Direkt im ebird2ornitho-Ordner speichern
+   * **Dateiformat:** **Programm** (Application)
+5. Auf **Sichern** klicken. Die erstellte `auto-updater-macOS.app` kann ab sofort für zukünftige Updates per Doppelklick genutzt werden.
