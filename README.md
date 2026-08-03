@@ -10,19 +10,19 @@
 
 ## Update
 
-### Empfohlen: Auto-Updater nutzen
+### Empfohlen: Auto-Downloader nutzen
 1. **Lokalen Ordner der Erweiterung öffnen**  
    *(Falls der Speicherort unbekannt ist: Im Browser unter **Erweiterungen** → **Erweiterungen verwalten** bei ebird2ornitho auf **Details** klicken und den Dateipfad neben **Geladen aus** ablesen)*
-2. **Auto-Updater öffnen**
-   * **Windows:** Doppelklick auf `auto-updater-windows.hta`
-   * **macOS:** Doppelklick auf `auto-updater-macOS.app`  
-     *(Hinweis macOS: Falls die App fehlt, muss sie einmalig erstellt werden – siehe [Anleitung für macOS](#anleitung-auto-updater-app-für-macos-erstellen))*
+2. **Auto-Downloader öffnen**
+   * **Windows:** Doppelklick auf `auto-downloader-windows.hta`
+   * **macOS:** Doppelklick auf `auto-downloader-macOS.app`  
+     *(Hinweis macOS: Falls die App fehlt, muss sie einmalig erstellt werden – siehe [Anleitung für macOS](#anleitung-auto-downloader-app-für-macos-erstellen))*
 3. **Erweiterung neu laden**  
    Browser → **Erweiterungen** → **Erweiterungen verwalten** → bei ebird2ornitho auf **Erneut laden** (Kreis-Symbol) klicken
 
 
 ### Alternative: Manuelles Update
-Falls der Auto-Updater nicht ausgeführt werden kann, lässt sich das Update auch manuell durchführen:
+Falls der Auto-Downloader nicht ausgeführt werden kann, lässt sich das Update auch manuell durchführen:
 1. Source code (zip) herunterladen (https://github.com/FlorianH27/ebird2ornitho/releases)
 2. zip-Ordner extrahieren
 3. Alle Dateien aus dem neu extrahierten Ordner kopieren
@@ -48,19 +48,19 @@ Falls der Auto-Updater nicht ausgeführt werden kann, lässt sich das Update auc
 9. Wie gewohnt speichern → fertig!
 
 
-## Anleitung Auto-Updater App für macOS erstellen
+## Anleitung Auto-Downloader App für macOS erstellen
 
-Da macOS das Ausführen unsignierter Updater aus Sicherheitsgründen einschränkt, muss der Auto-Updater für macOS einmalig selbst erstellt werden:
+Da macOS das Ausführen unsignierter Downloader aus Sicherheitsgründen einschränkt, muss der Auto-Downloader für macOS einmalig selbst erstellt werden:
 
 1. Auf dem Mac die App **Skript-Editor** (Script Editor) öffnen (zu finden über die Spotlight-Suche mit `Cmd + Leertaste`).
 2. "Neues Dokument" anklicken
-3. Den Inhalt der Datei <a href="https://github.com/FlorianH27/ebird2ornitho/blob/main/auto-update-raw-macOS.txt" target="_blank"><code>auto-update-raw-macOS.txt</code></a> in das neue leere Dokument einfügen.
+3. Den Inhalt der Datei <a href="https://github.com/FlorianH27/ebird2ornitho/blob/main/raw-downloader-macOS.txt" target="_blank"><code>raw-downloader-macOS.txt</code></a> in das neue leere Dokument einfügen.
 4. Im Menü oben auf **Ablage** → **Exportieren...** klicken.
 5. Folgende Einstellungen wählen:
-   * **Exportieren als:** `auto-updater-macOS`
+   * **Exportieren als:** `auto-downloader-macOS`
    * **Ort:** Eigenen ebird2ornitho-Ordner auswählen
    * **Dateiformat:** **App** (Program)
    * **Optionen:** Alle deaktivieren
    * **Codesignatur:** **Zum lokalen ausführen signieren**
-6. Auf **Sichern** klicken. Die erstellte `auto-updater-macOS.app` kann ab sofort für den Download von Updates per Doppelklick genutzt werden.
+6. Auf **Sichern** klicken. Die erstellte `auto-downloader-macOS.app` kann ab sofort für den Download von Updates per Doppelklick genutzt werden.
 7. Der Skript-Editor kann ohne weitere Dokumente zu speichern wieder geschlossen werden.
