@@ -109,10 +109,10 @@ Add-Type -AssemblyName PresentationFramework, PresentationCore, WindowsBase
                         <!-- Steps Box -->
                         <Border Background="#F8FAFC" BorderBrush="#E2E8F0" BorderThickness="2" CornerRadius="10" Padding="20">
                             <StackPanel>
-                                <TextBlock Text="Letzter Schritt im Browser:" FontSize="16" FontWeight="Bold" Foreground="#334155" Margin="0,0,0,10"/>
+                                <TextBlock Text="Letzter Schritt:" FontSize="16" FontWeight="Bold" Foreground="#334155" Margin="0,0,0,10"/>
                                 <TextBlock FontSize="14" Foreground="#334155" LineHeight="22">
                                     1. Gehe zum Browser<LineBreak/>
-                                    2. <Run FontStyle="Italic">Erweiterungen verwalten</Run> aufrufen<LineBreak/>
+                                    2. <Run FontWeight="Bold">Erweiterungen verwalten</Run> aufrufen<LineBreak/>
                                     3. Bei <Run FontWeight="Bold">ebird2ornitho</Run> auf <Run FontWeight="Bold">"Neu laden"</Run> klicken
                                 </TextBlock>
                             </StackPanel>
