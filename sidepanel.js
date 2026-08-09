@@ -328,30 +328,24 @@ function showData(data) {
 }
 
 let speciesMap = null;
-async function loadSpeciesMap() {
+function loadSpeciesMap() {
   if (speciesMap) return speciesMap;
-  const text = await (await fetch(chrome.runtime.getURL("ebird_names_to_code.csv"))).text();
+
   speciesMap = {};
+  const text = typeof ebirdNamesCsvData !== "undefined" ? ebirdNamesCsvData : "";
+
   text.split(/\r?\n/).filter(line => line.trim() && !line.startsWith("DE;")).forEach(line => {
     const [de, en, fr, code] = line.split(";").map(v => v.trim());
     if (de) speciesMap[`de:${de}`] = code;
     if (en) speciesMap[`en:${en}`] = code;
     if (fr) speciesMap[`fr:${fr}`] = code;
   });
+
   return speciesMap;
 }
 
-let birdIdMap = null;
-async function loadBirdIdMap() {
-  if (birdIdMap) return birdIdMap;
-  try {
-    const response = await fetch("https://raw.githubusercontent.com/FlorianH27/ebird2ornitho/refs/heads/main/code_to_id.txt");
-    birdIdMap = JSON.parse((await response.text()).replace(/'/g, '"'));
-  } catch(error) {
-    console.error("Fehler beim Laden von code_to_id.txt", error);
-    birdIdMap = {};
-  }
-  return birdIdMap;
+function loadBirdIdMap() {
+  return typeof birdIdMap !== "undefined" ? birdIdMap : {};
 }
 
 function getEbirdLanguage() {
@@ -447,23 +441,8 @@ function isPointInCountry(lat, lon, countryData) {
   return countryData.polygons.some(polygon => isPointInPolygon([lon, lat], polygon));
 }
 
-let countryDataCache = null;
-async function loadCountryData() {
-  if (countryDataCache) return countryDataCache;
-  try {
-    const rawGithubUrl = "https://raw.githubusercontent.com/FlorianH27/ebird2ornitho/main/country_polygons.json";
-    const response = await fetch(rawGithubUrl);
-
-    if (!response.ok) {
-      throw new Error(`HTTP Error: ${response.status}`);
-    }
-
-    countryDataCache = await response.json();
-  } catch (e) {
-    console.error("Fehler beim Laden der Länder-Polygone von GitHub:", e);
-    countryDataCache = {};
-  }
-  return countryDataCache;
+function loadCountryData() {
+  return typeof countryDataCache !== "undefined" ? countryDataCache : {};
 }
 
 // ======================================================
@@ -683,9 +662,9 @@ async function openLocation() {
   });
 }
 
-async function getAtlasMap(country) {
+function getAtlasMap(country) {
   try {
-    const text = await (await fetch(chrome.runtime.getURL("breedingcode.csv"))).text();
+    const text = typeof breedingCodeCsvData !== "undefined" ? breedingCodeCsvData : "";
     const lines = text.split(/\r?\n/).filter(line => line.trim());
     if (!lines.length) return {};
 

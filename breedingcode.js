@@ -1,4 +1,4 @@
-ebirdEU;ebirdES;CH;DE
+const breedingCodeCsvData = `ebirdEU;ebirdES;CH;DE
 NY;NP;19;C16
 NE;NH;19;C15
 FS;SF;15;C14a
@@ -22,3 +22,4 @@ S7;S7;3;A2
 S;MC;3;A2
 H;H;2;A1
 F;S;1;-
+`;

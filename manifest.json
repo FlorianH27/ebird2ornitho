@@ -11,8 +11,7 @@
   ],
 
   "host_permissions": [
-    "https://raw.githubusercontent.com/FlorianH27/ebird2ornitho/*",
-    "https://www.ornitho.at/index.php?m_id=1423*",
+        "https://www.ornitho.at/index.php?m_id=1423*",
         "https://www.fauna.hr/index.php?m_id=1423*",
 
         "http://franche-comte.lpo.fr/index.php?m_id=1423*",

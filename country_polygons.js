@@ -1,4 +1,4 @@
-{
+const countryDataCache = {
   "CH": {
     "name": "Schweiz",
     "url": "https://www.ornitho.ch/index.php?m_id=10&backlink=rset&taxo_group=o#zoom=",
@@ -4514,4 +4514,4 @@
       [[8.999,43.595],[9.0196,43.595],[9.0196,43.5808],[8.999,43.5808],[8.999,43.595]]
     ]
   }
-}
+};
