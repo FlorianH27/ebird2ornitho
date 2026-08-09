@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "ebird2ornitho",
   "version": "3.0.0",
-  "description": "Diese Erweiterung ermöglicht es, Daten aus eBird Checklisten zu extrahieren. Diese können danach beim Melden von Beobachtungslisten auf allen Biolovision Portalen wieder im passenden Format eingefügt werden. ",
+  "description": "ebird2ornitho kann Daten von eBird Checklisten erfassen und beim Melden von Listen auf Biolovision-Portalen wieder eingefügen.",
 
   "permissions": [
     "activeTab",
@@ -80,6 +80,12 @@
     "default_title": "eBird2ornitho",
     "default_icon": "icon.png"
   },
+
+  "icons": {
+  "16": "icon16.png",
+  "48": "icon48.png",
+  "128": "icon128.png"
+},
 
   "background": {
     "service_worker": "background.js"
