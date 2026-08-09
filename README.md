@@ -50,7 +50,7 @@ Falls der Auto-Downloader nicht ausgeführt werden kann, lässt sich das Update 
 
 ## Anleitung Auto-Downloader App für macOS erstellen
 
-Da macOS das Ausführen unsignierter Downloader aus Sicherheitsgründen einschränkt, muss der Auto-Downloader für macOS einmalig selbst erstellt werden:
+Da macOS das Ausführen unsignierter Apps aus Sicherheitsgründen einschränkt, muss der Auto-Downloader für macOS einmalig selbst erstellt werden:
 
 1. Auf dem Mac die App **Skript-Editor** (Script Editor) öffnen (zu finden über die Spotlight-Suche mit `Cmd + Leertaste`).
 2. "Neues Dokument" anklicken
