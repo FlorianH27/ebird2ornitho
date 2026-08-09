@@ -1,10 +1,9 @@
 // ======================================================
 // eBird2Ornitho - sidepanel.js
-// Teil 1: Hilfsfunktionen, Settings, Update-System
+// Teil 1: Hilfsfunktionen, Settings
 // ======================================================
 
 let strassentaubeEnabled = true;
-const MAX_UNLOCKS = 10;
 
 // ------------------------------------------------------
 // Kleine Hilfsfunktionen (Storage & UI)
@@ -263,7 +262,7 @@ libReplaceBtn?.addEventListener("click", () => {
   const inputStr = libImportArea.value.trim();
   if (!inputStr) return;
 
-  if (!confirm("Wirklich alle Verknüpfungen überschreiben?")) return;
+  if (!confirm("Wirklich alle Verknüpfungen in der Location Library überschreiben?")) return;
 
   try {
     const newData = JSON.parse(inputStr);
@@ -278,172 +277,8 @@ libReplaceBtn?.addEventListener("click", () => {
   }
 });
 
-
-
 // ======================================================
-// Teil 4: Update Handling & UI Lock
-// ======================================================
-
-function compareVersions(a, b) {
-  const va = a.split(".").map(Number);
-  const vb = b.split(".").map(Number);
-  const length = Math.max(va.length, vb.length);
-  for (let i = 0; i < length; i++) {
-    const diff = (va[i] || 0) - (vb[i] || 0);
-    if (diff !== 0) return diff;
-  }
-  return 0;
-}
-
-async function checkUpdate() {
-  const manifest = chrome.runtime.getManifest();
-  const localVersion = manifest.version.trim();
-  const statusEl = document.getElementById("status");
-  if (!statusEl) return;
-
-  try {
-    const url = `https://raw.githubusercontent.com/FlorianH27/ebird2ornitho/main/version.json?cb=${Date.now()}`;
-    const res = await fetch(url, { cache: "no-store" });
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-
-    const data = await res.json();
-    const remoteVersion = (data.version || "").trim();
-    if (!remoteVersion) throw new Error("Keine Versionsnummer gefunden");
-
-    if (compareVersions(remoteVersion, localVersion) > 0) {
-      statusEl.innerHTML = `<a href="https://github.com/FlorianH27/ebird2ornitho/releases/latest" target="_blank">Update verfügbar: ${remoteVersion}</a>`;
-      await lockUI(remoteVersion);
-    } else {
-      await chrome.storage.local.remove("unlockAttempts");
-      statusEl.textContent = "Bereit";
-    }
-  } catch (e) {
-    console.error("Update-Check fehlgeschlagen:", e);
-    statusEl.textContent = "Bereit";
-  }
-}
-
-async function lockUI(remoteVersion) {
-  const { unlockAttempts = 0 } = await chrome.storage.local.get("unlockAttempts");
-  const remaining = Math.max(0, MAX_UNLOCKS - unlockAttempts);
-
-  document.querySelectorAll("button").forEach(btn => btn.disabled = true);
-
-  const overlay = document.createElement("div");
-  overlay.id = "update-lock-overlay";
-  overlay.style = "position:fixed; inset:0; background:rgba(255,255,255,0.98); z-index:9999; display:flex; align-items:center; justify-content:center; text-align:center; padding:20px; font-family:sans-serif;";
-
-  overlay.innerHTML = `
-    <div style="max-width: 420px; background: #fff; padding: 24px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.15);">
-      <h2 style="margin-top: 0; margin-bottom: 4px; font-size: 20px; color: #0f172a;">Version ${remoteVersion} verfügbar</h2>
-
-      <a href="https://github.com/FlorianH27/ebird2ornitho/releases/latest" target="_blank" style="display: inline-block; font-size: 11px; color: #2563eb; text-decoration: none; font-weight: 500; margin-bottom: 12px;">
-        Änderungsprotokoll (Changelog) ansehen &rarr;
-      </a>
-
-      <div style="background: #eef6ff; border: 1px solid #3b82f6; border-radius: 8px; padding: 14px; margin: 16px 0; text-align: left;">
-        <strong style="font-size: 13px; color: #1d4ed8; display: block; margin-bottom: 8px;">Anleitung Update:</strong>
-
-        <ol style="font-size: 12px; color: #1e293b; margin: 0; padding-left: 18px; line-height: 1.5;">
-          <li>
-            <b>Lokalen Ordner der Erweiterung öffnen</b><br>
-            <span style="font-size: 11px; color: #475569;">
-               Lokalen Ordner öffnen, in dem die Erweiterung gespeichert wurde. Falls der Speicherort unbekannt ist, bei
-<button id="openDetailsBtn" style="display: inline; width: auto; background: none; border: none; padding: 0; color: #2563eb; text-decoration: underline; cursor: pointer; font-size: 11px; vertical-align: baseline;">Details</button>                   neben <b>Geladen aus</b> den Dateipfad nachschauen.
-            </span>
-          </li>
-          <li style="margin-top: 6px;">
-            <b>Im lokalen Ordner den Downloader öffnen</b>
-            <ul style="margin: 2px 0 0 0; padding-left: 16px; font-size: 11px;">
-              <li><b>Windows:</b> <code>auto-downloader-windows.bat</code></li>
-              <li>
-                <b>macOS:</b> <code>auto-downloader-macOS.app</code><br>
-                <span style="font-size: 10px; color: #64748b;">
-                  (<b>Hinweis macOS:</b> Falls auto-downloader-macOS.app fehlt, muss dieser einmalig selbst erstellt werden – <a href="https://github.com/FlorianH27/ebird2ornitho/blob/main/README.md#anleitung-auto-downloader-app-f%C3%BCr-macos-erstellen" target="_blank" style="color: #2563eb;">Anleitung</a>)
-                </span>
-              </li>
-            </ul>
-          </li>
-          <li style="margin-top: 6px;">
-            <b>Erweiterung neu laden</b><br>
-            <span style="font-size: 11px; color: #475569;">
-<button id="openExtPageBtn" style="display: inline; width: auto; background: none; border: none; padding: 0; color: #2563eb; text-decoration: underline; cursor: pointer; font-size: 11px; vertical-align: baseline;">Erweiterungen verwalten</button>              → bei ebird2ornitho auf <b>Erneut laden</b> (Kreis-Symbol) klicken
-            </span>
-          </li>
-        </ol>
-      </div>
-
-      <a href="https://github.com/FlorianH27/ebird2ornitho/blob/main/README.md#update" target="_blank" style="font-size: 12px; text-decoration: underline;">
-        Anleitung online öffnen
-      </a>
-
-      <div style="background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; padding: 12px; margin: 16px 0; text-align: left;">
-        <span style="font-size: 12px; font-weight: bold; color: #000; display: block; margin-bottom: 4px;">Optional: Location Library Backup</span>
-        <span style="font-size: 11px; color: #475569; display: block; margin-bottom: 8px;">
-          Alle Daten bleiben beim Update erhalten. Optional kann die Location-Library kopiert und nach dem Update in den Einstellungen wieder eingefügt werden:
-        </span>
-        <button id="copyLocationBtn" style="background: #ffffff; color: #334155; border: 1px solid #cbd5e1; padding: 6px 10px; font-size: 11px; font-weight: 600; border-radius: 4px; width: 100%; cursor: pointer;">
-          Library in Zwischenablage kopieren
-        </button>
-      </div>
-
-      ${remaining > 0 ? `
-        <div style="margin-top: 20px; border-top: 1px solid #f1f5f9; padding-top: 14px;">
-          <button id="unlockOnceBtn" style="background: transparent; color: #94a3b8; border: 1px solid #e2e8f0; padding: 8px 12px; font-size: 12px; border-radius: 6px; cursor: pointer;">
-            Update überspringen
-          </button>
-        </div>
-      ` : ""}
-    </div>
-  `;
-  document.body.appendChild(overlay);
-
-  // Link 1: Details öffnen
-  document.getElementById("openDetailsBtn").addEventListener("click", () => {
-    const extId = chrome.runtime.id;
-    try {
-      chrome.tabs.create({ url: `chrome://extensions/?id=${extId}` });
-    } catch (err) {
-      chrome.tabs.create({ url: "chrome://extensions" });
-    }
-  });
-
-  // Link 2: Erweiterungen verwalten öffnen
-  document.getElementById("openExtPageBtn").addEventListener("click", () => {
-    chrome.tabs.create({ url: "chrome://extensions" });
-  });
-
-  // Location Backup kopieren
-  document.getElementById("copyLocationBtn").addEventListener("click", async (e) => {
-    e.preventDefault();
-    const btn = e.target;
-    try {
-      const data = await chrome.storage.local.get("locationLinks");
-      const locationString = data.locationLinks ? JSON.stringify(data.locationLinks, null, 2) : "Keine Location-Links im Speicher gefunden.";
-      await navigator.clipboard.writeText(locationString);
-
-      btn.style.background = "#dcfce7"; btn.style.color = "#166534"; btn.style.borderColor = "#86efac"; btn.textContent = "Kopiert!";
-      setTimeout(() => {
-        btn.style.background = "#ffffff"; btn.style.color = "#334155"; btn.style.borderColor = "#cbd5e1"; btn.textContent = "Bibliothek in Zwischenablage kopieren";
-      }, 2000);
-    } catch (err) {
-      btn.textContent = "Fehler beim Kopieren";
-    }
-  });
-
-  // Unlock Button
-  if (remaining > 0) {
-    document.getElementById("unlockOnceBtn").addEventListener("click", async () => {
-      await chrome.storage.local.set({ unlockAttempts: unlockAttempts + 1 });
-      overlay.remove();
-      document.querySelectorAll("button").forEach(btn => btn.disabled = false);
-    });
-  }
-}
-
-
-// ======================================================
-// Teil 5: Datenanzeige, Extraktion & Mapping
+// Teil 4: Datenanzeige, Extraktion & Mapping
 // ======================================================
 
 function showData(data) {
@@ -451,13 +286,11 @@ function showData(data) {
   const start = new Date(data.start);
   const end = new Date(data.end);
 
-  // Ort anzeigen
   const locationEl = document.getElementById("locationDisplay");
   if (locationEl) {
     locationEl.textContent = data.location || "—";
   }
 
-  // Datum & Zeit zusammen auf einer Zeile anzeigen
   const dateTimeEl = document.getElementById("dateTimeDisplay");
   if (dateTimeEl) {
     const formattedDate = start.toLocaleDateString("de-DE", { day: "2-digit", month: "2-digit", year: "numeric" });
@@ -592,11 +425,11 @@ async function extractEbirdData() {
 }
 
 // ======================================================
-// Teil 6: Polygon / Point-in-Polygon Hilfsfunktionen
+// Teil 5: Polygon / Point-in-Polygon Hilfsfunktionen
 // ======================================================
 
 function isPointInPolygon(point, vs) {
-  const x = point[0], y = point[1]; // x = lon, y = lat
+  const x = point[0], y = point[1];
   let inside = false;
   for (let i = 0, j = vs.length - 1; i < vs.length; j = i++) {
     const xi = vs[i][0], yi = vs[i][1];
@@ -634,7 +467,7 @@ async function loadCountryData() {
 }
 
 // ======================================================
-// Teil 7: Ornitho Actions & Visibility Guards
+// Teil 6: Ornitho Actions & Visibility Guards
 // ======================================================
 
 async function insertMetadata() {
@@ -727,7 +560,7 @@ async function updateTransferButton(forcedUrl = null) {
   try {
     let url = forcedUrl || (await chrome.tabs.query({ active: true, lastFocusedWindow: true }))[0]?.url || "";
 
-  if (!url || url.startsWith("chrome://") || url.startsWith("edge://") || url === "about:blank") {
+    if (!url || url.startsWith("chrome://") || url.startsWith("edge://") || url === "about:blank") {
       if (transferButton) transferButton.style.display = "none";
       if (emptySpeciesCard) emptySpeciesCard.style.display = "none";
       if (failedAtlasList) failedAtlasList.style.display = "none";
@@ -786,10 +619,8 @@ async function updateOpenLocationButton() {
   const hasLink = ebirdData?.location && locationLinks[ebirdData.location];
   const hasCoordinates = !!ebirdData?.coordinates?.lat && !!ebirdData?.coordinates?.lon;
 
-  // 1. Unveränderte Logik für Verknüpfungs-Button
   if (openButton) openButton.style.display = hasLink ? "flex" : "none";
 
-  // 2. Dynamische Erzeugung der Karten-Buttons nach Ländern
   if (mapBtnContainer) {
     mapBtnContainer.innerHTML = "";
 
@@ -807,8 +638,7 @@ async function updateOpenLocationButton() {
         const btn = document.createElement("button");
         btn.className = "ornitho-map-btn";
 
-        // Domain aus der URL extrahieren (z. B. "https://www.ornitho.ch/..." -> "ornitho.ch")
-        let domain = code; // Fallback auf Länderkürzel
+        let domain = code;
         try {
           domain = new URL(countryInfo.url).hostname.replace(/^www\./, '');
         } catch (e) {
@@ -816,8 +646,6 @@ async function updateOpenLocationButton() {
         }
 
         btn.title = `Karte in ${domain} öffnen`;
-
-        // Nur das Länderkürzel als Text setzen
         btn.textContent = code;
 
         btn.addEventListener("click", () => {
@@ -898,7 +726,7 @@ function initActionButtons() {
 }
 
 // ======================================================
-// Teil 8: Initialisierung & Main Loop
+// Teil 7: Initialisierung & Main Loop
 // ======================================================
 
 async function init() {
@@ -914,7 +742,6 @@ async function init() {
   hideOpenLocationButton();
   await clearEbirdSessionData();
 
-  // Settings & Storage Syncing
   initSettingsMenu();
   await initStrassentaubeSetting();
   await inituseAtlasCodesCTSetting();
@@ -923,7 +750,6 @@ async function init() {
   initBreedingSetting();
   initCommentsSetting();
 
-  // UI Functionalities
   initActionButtons();
   initSpeciesFilter();
 
@@ -931,7 +757,6 @@ async function init() {
   if (card) card.style.display = "none";
   document.getElementById("transferSpeciesBtn")?.addEventListener("click", () => { if (card) card.style.display = "flex"; });
 
-  // Messaging Map Listener
   chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     if (message.action === "getAtlasMap" && message.country) {
       getAtlasMap(message.country).then(sendResponse);
@@ -939,15 +764,9 @@ async function init() {
     }
   });
 
-  // Initiale URL Checks
   updateLinkButton();
   updateTransferButton();
 
-// ------------------------------------------------------
-  // Tab-Wechsel & URL-Änderungen (Ohne 'tabs'-Berechtigung)
-  // ------------------------------------------------------
-
-  // Hilfsfunktion, die immer den aktuellen Tab im aktiven Fenster abfragt
   async function refreshActiveTabState() {
     try {
       const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
@@ -960,15 +779,11 @@ async function init() {
     }
   }
 
-  // Wenn der Nutzer den Tab wechselt
   chrome.tabs.onActivated.addListener(async () => {
-    // Kurze Verzögerung, damit Chrome den Tab-Wechsel vollständig abgeschlossen hat
     setTimeout(refreshActiveTabState, 50);
   });
 
-  // Wenn sich die URL im aktuellen Tab ändert (z.B. Navigation)
   chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-    // Wir prüfen nur, ob der aktualisierte Tab auch wirklich der aktive ist
     if (tab.active && (changeInfo.url || changeInfo.status === "complete")) {
       if (tab.url) {
         updateLinkButton(tab.url);
@@ -977,16 +792,11 @@ async function init() {
     }
   });
 
-  // Wenn das Browserfenster den Fokus wechselt
   chrome.windows.onFocusChanged.addListener((windowId) => {
     if (windowId !== chrome.windows.WINDOW_ID_NONE) {
       refreshActiveTabState();
     }
   });
-
-
-  checkUpdate();
-
 }
 
 if (document.readyState === "loading") {
@@ -996,16 +806,14 @@ if (document.readyState === "loading") {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-  // --- Footer Zoom-Logik (+ / -) ---
   const zoomInBtn = document.getElementById('zoomInBtn');
   const zoomOutBtn = document.getElementById('zoomOutBtn');
 
-  // Verfügbare Zoom-Stufen
   const zoomSteps = [0.8, 0.9, 1.0, 1.1, 1.25];
 
   function getCurrentZoomIndex(currentVal) {
     const num = parseFloat(currentVal);
-    let closestIdx = 2; // Standard 1.0
+    let closestIdx = 2;
     let minDiff = Infinity;
     zoomSteps.forEach((step, idx) => {
       const diff = Math.abs(step - num);
@@ -1018,13 +826,11 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function applyZoom(val) {
-    // Auf 2 Nachkommastellen begrenzen, um Fließkomma-Fehler zu vermeiden
     const roundedVal = Math.round(val * 100) / 100;
     document.documentElement.style.setProperty('--zoom-factor', roundedVal);
     localStorage.setItem('panelZoom', roundedVal);
   }
 
-  // Gespeicherten Zoom laden
   const savedZoom = localStorage.getItem('panelZoom');
   if (savedZoom) {
     applyZoom(savedZoom);
@@ -1051,6 +857,4 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
   }
-
-  // --- Dein restlicher Code für das Side Panel ---
 });
