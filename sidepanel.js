@@ -278,22 +278,7 @@ libReplaceBtn?.addEventListener("click", () => {
   }
 });
 
-document.getElementById("extensionsLinkBtn")?.addEventListener("click", () => {
-  let url = "chrome://extensions";
-  if (navigator.userAgent.indexOf("Edg") > -1) {
-    url = "edge://extensions";
-  }
 
-  if (typeof chrome !== "undefined" && chrome.tabs && chrome.tabs.create) {
-    try {
-      chrome.tabs.create({ url: url });
-    } catch (err) {
-      window.open(url);
-    }
-  } else {
-    window.open(url);
-  }
-});
 
 // ======================================================
 // Teil 4: Update Handling & UI Lock
@@ -709,7 +694,8 @@ async function updateLinkButton(forcedUrl = null) {
   if (!button) return;
 
   try {
-    let url = forcedUrl || (await chrome.tabs.query({ active: true, lastFocusedWindow: true }))[0]?.url || "";
+    let url = forcedUrl || (await chrome.tabs.query({ active: true, lastFocusedWindow: true }))[0]?.url;
+
     if (url.includes("index.php?m_id=1423&wizard_target=daily")) {
       button.style.display = "block";
       const { ebirdData, locationLinks = {} } = await getStorage(["ebirdData", "locationLinks"]);
@@ -721,9 +707,11 @@ async function updateLinkButton(forcedUrl = null) {
         button.dataset.mode = "link";
       }
     } else {
+      console.log("not ornitho");
       button.style.display = "none";
     }
   } catch (error) {
+    console.log("Error");
     button.style.display = "none";
   }
 }
@@ -738,6 +726,15 @@ async function updateTransferButton(forcedUrl = null) {
 
   try {
     let url = forcedUrl || (await chrome.tabs.query({ active: true, lastFocusedWindow: true }))[0]?.url || "";
+
+  if (!url || url.startsWith("chrome://") || url.startsWith("edge://") || url === "about:blank") {
+      if (transferButton) transferButton.style.display = "none";
+      if (emptySpeciesCard) emptySpeciesCard.style.display = "none";
+      if (failedAtlasList) failedAtlasList.style.display = "none";
+      if (failedSpeciesList) failedSpeciesList.style.display = "none";
+      return;
+    }
+
     const isCurrentStateDaily = url.includes("index.php?m_id=1423&wizard_current_state=daily");
     const displayStyle = isCurrentStateDaily ? "flex" : "none";
 
@@ -946,39 +943,50 @@ async function init() {
   updateLinkButton();
   updateTransferButton();
 
-  // URL-Wächter (onUpdated & onActivated)
+// ------------------------------------------------------
+  // Tab-Wechsel & URL-Änderungen (Ohne 'tabs'-Berechtigung)
+  // ------------------------------------------------------
+
+  // Hilfsfunktion, die immer den aktuellen Tab im aktiven Fenster abfragt
+  async function refreshActiveTabState() {
+    try {
+      const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+      if (tab?.url) {
+        updateLinkButton(tab.url);
+        updateTransferButton(tab.url);
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  // Wenn der Nutzer den Tab wechselt
+  chrome.tabs.onActivated.addListener(async () => {
+    // Kurze Verzögerung, damit Chrome den Tab-Wechsel vollständig abgeschlossen hat
+    setTimeout(refreshActiveTabState, 50);
+  });
+
+  // Wenn sich die URL im aktuellen Tab ändert (z.B. Navigation)
   chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-    if (tab.active) {
-      const targetUrl = changeInfo.url || (changeInfo.status === "complete" ? tab.url : null);
-      if (targetUrl) {
-        updateLinkButton(targetUrl);
-        updateTransferButton(targetUrl);
+    // Wir prüfen nur, ob der aktualisierte Tab auch wirklich der aktive ist
+    if (tab.active && (changeInfo.url || changeInfo.status === "complete")) {
+      if (tab.url) {
+        updateLinkButton(tab.url);
+        updateTransferButton(tab.url);
       }
     }
   });
 
-  chrome.tabs.onActivated.addListener(async (activeInfo) => {
-    setTimeout(async () => {
-      try {
-        const tab = await chrome.tabs.get(activeInfo.tabId);
-        if (tab?.url) {
-          updateLinkButton(tab.url);
-          updateTransferButton(tab.url);
-        }
-      } catch (e) {
-        console.error(e);
-      }
-    }, 50);
-  });
-
+  // Wenn das Browserfenster den Fokus wechselt
   chrome.windows.onFocusChanged.addListener((windowId) => {
     if (windowId !== chrome.windows.WINDOW_ID_NONE) {
-      updateLinkButton();
-      updateTransferButton();
+      refreshActiveTabState();
     }
   });
 
+
   checkUpdate();
+
 }
 
 if (document.readyState === "loading") {
@@ -987,3 +995,62 @@ if (document.readyState === "loading") {
   init();
 }
 
+document.addEventListener('DOMContentLoaded', () => {
+  // --- Footer Zoom-Logik (+ / -) ---
+  const zoomInBtn = document.getElementById('zoomInBtn');
+  const zoomOutBtn = document.getElementById('zoomOutBtn');
+
+  // Verfügbare Zoom-Stufen
+  const zoomSteps = [0.8, 0.9, 1.0, 1.1, 1.25];
+
+  function getCurrentZoomIndex(currentVal) {
+    const num = parseFloat(currentVal);
+    let closestIdx = 2; // Standard 1.0
+    let minDiff = Infinity;
+    zoomSteps.forEach((step, idx) => {
+      const diff = Math.abs(step - num);
+      if (diff < minDiff) {
+        minDiff = diff;
+        closestIdx = idx;
+      }
+    });
+    return closestIdx;
+  }
+
+  function applyZoom(val) {
+    // Auf 2 Nachkommastellen begrenzen, um Fließkomma-Fehler zu vermeiden
+    const roundedVal = Math.round(val * 100) / 100;
+    document.documentElement.style.setProperty('--zoom-factor', roundedVal);
+    localStorage.setItem('panelZoom', roundedVal);
+  }
+
+  // Gespeicherten Zoom laden
+  const savedZoom = localStorage.getItem('panelZoom');
+  if (savedZoom) {
+    applyZoom(savedZoom);
+  }
+
+  if (zoomInBtn) {
+    zoomInBtn.addEventListener('click', () => {
+      const currentVal = getComputedStyle(document.documentElement).getPropertyValue('--zoom-factor').trim() || '1.0';
+      let idx = getCurrentZoomIndex(currentVal);
+      if (idx < zoomSteps.length - 1) {
+        idx++;
+        applyZoom(zoomSteps[idx]);
+      }
+    });
+  }
+
+  if (zoomOutBtn) {
+    zoomOutBtn.addEventListener('click', () => {
+      const currentVal = getComputedStyle(document.documentElement).getPropertyValue('--zoom-factor').trim() || '1.0';
+      let idx = getCurrentZoomIndex(currentVal);
+      if (idx > 0) {
+        idx--;
+        applyZoom(zoomSteps[idx]);
+      }
+    });
+  }
+
+  // --- Dein restlicher Code für das Side Panel ---
+});

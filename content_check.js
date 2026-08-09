@@ -1,5 +1,5 @@
 // ----------------- Konfiguration -----------------
-// Liste der Domains, bei denen die Blockade STRIKT sein muss (kein Speichern ohne Code)
+// Liste der Domains, bei denen die Blockade STRIKT sein muss (kein Speichern ohne Brutzeitcode)
 const hardBlockDomains = [
     "ornitho.it", // Beispiele für Länder, die den CH-Atlascode 1 oder analog kennen
     "ornitho.ch"

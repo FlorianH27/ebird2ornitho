@@ -141,6 +141,29 @@ async function setAtlasCode(specieEl, breedingCode, country, isLast = false) {
 // ------------------ Hilfsfunktion: Auswahl-Overlay anzeigen ------------------
 function showSpeciesSelectionOverlay(speciesName, birdIdsArray) {
     return new Promise((resolve) => {
+        // Filtere vorab alle IDs heraus, zu denen im DOM absolut kein Name gefunden werden kann
+        const validIds = birdIdsArray.map(id => id.trim()).filter(cleanId => {
+            const li = document.querySelector(`#species_box li[id="${cleanId}"]`);
+            if (li && (li.getAttribute('value_name') || li.innerText.trim())) return true;
+
+            const container = document.querySelector(`[bird_id="${cleanId}"]`);
+            if (container && container.querySelector('.bird_name b')) return true;
+
+            return false;
+        });
+
+        // Wenn keine einzige gültige Option im DOM existiert, abbrechen
+        if (validIds.length === 0) {
+            resolve(null);
+            return;
+        }
+
+        // Wenn genau eine Option übrig bleibt, diese sofort automatisch wählen
+        if (validIds.length === 1) {
+            resolve(validIds[0]);
+            return;
+        }
+
         const overlay = document.createElement('div');
         Object.assign(overlay.style, {
             position: 'fixed',
@@ -164,11 +187,11 @@ function showSpeciesSelectionOverlay(speciesName, birdIdsArray) {
             textAlign: 'center'
         });
 
-	// Extrahiert alles vor der ersten '(' oder '[' und entfernt überflüssige Leerzeichen
-	const cleanedSpeciesName = speciesName.split(/[([]/)[0].trim();
+        // Extrahiert alles vor der ersten '(' oder '[' und entfernt überflüssige Leerzeichen
+        const cleanedSpeciesName = speciesName.split(/[([]/)[0].trim();
 
-	box.innerHTML = `
-            <h3 style="margin-top: 0; color: #1c7ed6; font-size: 18px; font-weight: normal;">Die Art <strong style="font-weight: 	bold;">${cleanedSpeciesName}</strong> ist mehrdeutig</h3>
+        box.innerHTML = `
+            <h3 style="margin-top: 0; color: #1c7ed6; font-size: 18px; font-weight: normal;">Die Art <strong style="font-weight: bold;">${cleanedSpeciesName}</strong> ist mehrdeutig</h3>
             <p style="font-size: 14px; color: #333; margin-bottom: 20px;">
                 Wähle die passende Art aus, die eingefügt werden soll.
             </p>
@@ -179,17 +202,15 @@ function showSpeciesSelectionOverlay(speciesName, birdIdsArray) {
         document.body.appendChild(overlay);
 
         const btnContainer = box.querySelector('#overlay-id-buttons');
-        birdIdsArray.forEach(id => {
-            const cleanId = id.trim();
+
+        validIds.forEach(cleanId => {
             let displayName = null;
 
-            // --- STRATEGIE 1: Suchen im klassischen species_box li (Erster Fall) ---
             const li = document.querySelector(`#species_box li[id="${cleanId}"]`);
             if (li) {
                 displayName = li.getAttribute('value_name') || li.innerText.trim();
             }
 
-            // --- STRATEGIE 2: Suchen im neuen div-Container mit bird_id (Zweiter Fall) ---
             if (!displayName) {
                 const container = document.querySelector(`[bird_id="${cleanId}"]`);
                 if (container) {
@@ -200,12 +221,6 @@ function showSpeciesSelectionOverlay(speciesName, birdIdsArray) {
                 }
             }
 
-            // --- NEU: Wenn kein Name gefunden wurde, wird dieser Button komplett ausgeblendet (übersprungen) ---
-            if (!displayName) {
-                return; // Springt zur nächsten ID im Array weiter, ohne einen Button zu erzeugen
-            }
-            
-            // Ab hier existiert garantiert ein Name
             const btn = document.createElement('button');
             btn.textContent = `${displayName} `;
 
@@ -249,9 +264,12 @@ async function transferSpecies(speciesData) {
 
     const atlascodesSupported = !!country;
 
+    // Speichert bereits erfolgreich eingefügte birdIDs während dieses Durchlaufs
+    const processedBirdIDs = new Set();
+
     for (let i = 0; i < speciesData.length; i++) {
         const sp = speciesData[i];
-        
+
         let finalBirdID = sp.birdID;
         if (Array.isArray(finalBirdID)) {
             if (finalBirdID.length > 1) {
@@ -262,6 +280,13 @@ async function transferSpecies(speciesData) {
         }
 
         if (!finalBirdID) {
+            failedSpecies.push({ name: sp.name, count: sp.count });
+            continue;
+        }
+
+        // Wenn diese birdID in diesem Durchlauf bereits verarbeitet wurde,
+        // fügen wir sie direkt der Fehlerliste hinzu, da Ornitho keine Duplikate erlaubt.
+        if (processedBirdIDs.has(finalBirdID)) {
             failedSpecies.push({ name: sp.name, count: sp.count });
             continue;
         }
@@ -279,6 +304,9 @@ async function transferSpecies(speciesData) {
                 continue;
             }
         }
+
+        // Markiere diese birdID als erfolgreich hinzugefügt/bearbeitet
+        processedBirdIDs.add(finalBirdID);
 
         const totalInput = findTotalInput(specieEl);
         const select = findEstimationSelect(specieEl);

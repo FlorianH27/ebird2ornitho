@@ -4,8 +4,12 @@
 <meta charset="UTF-8">
 <style>
 /* =========================
-   Allgemeine Einstellungen
+   Allgemeine Einstellungen & Zoom
    ========================= */
+:root {
+  --zoom-factor: 1;
+}
+
 *, *:before, *:after {
   box-sizing: border-box;
 }
@@ -18,27 +22,31 @@ body {
   height: 100vh;
   display: flex;
   flex-direction: column;
+  font-size: calc(14px * var(--zoom-factor));
 }
+
 header {
-  padding: 16px;
+  padding: calc(16px * var(--zoom-factor));
   border-bottom: 1px solid #e0e0e0;
   background: #fff;
 }
 header h1 {
-  font-size: 16px;
+  font-size: calc(16px * var(--zoom-factor));
   margin: 0;
 }
 #status {
-  font-size: 12px;
+  font-size: calc(12px * var(--zoom-factor));
   color: #555;
-  min-height: 16px;
+  min-height: calc(16px * var(--zoom-factor));
 }
 main {
-  padding: 16px;
+  padding: calc(16px * var(--zoom-factor));
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: calc(16px * var(--zoom-factor));
+  overflow-y: auto;
+  padding-bottom: calc(36px * var(--zoom-factor));
 }
 
 /* =========================
@@ -46,12 +54,12 @@ main {
    ========================= */
 button {
   border: none;
-  border-radius: 6px;
-  padding: 10px 14px;
+  border-radius: calc(6px * var(--zoom-factor));
+  padding: calc(10px * var(--zoom-factor)) calc(14px * var(--zoom-factor));
   font-weight: 600;
   cursor: pointer;
   transition: 0.2s;
-  font-size: 14px;
+  font-size: calc(14px * var(--zoom-factor));
   width: 100%;
 }
 
@@ -63,20 +71,18 @@ button {
   background-color: #1971c2;
 }
 
-/* Button-Zeile */
 #insertButtonsRow {
   display: flex;
-  gap: 6px;
+  gap: calc(6px * var(--zoom-factor));
   align-items: stretch;
   width: 100%;
 }
 
-/* Metadaten-Button */
 #insertBtn {
   flex: 1 1 auto;
   width: 100%;
   min-width: 0;
-  padding: 10px 8px;
+  padding: calc(10px * var(--zoom-factor)) calc(8px * var(--zoom-factor));
   background-color: #2f9e44;
   color: white;
   white-space: nowrap;
@@ -87,52 +93,45 @@ button {
   background-color: #2b8a3e;
 }
 
-/* Verhindert Gaps, wenn der Container noch keine Buttons enthält */
 #ornithoMapBtnContainer:empty {
   display: none !important;
 }
 
-/* Container für zusammengeschweißte Map-Buttons */
 #ornithoMapBtnContainer {
   display: flex;
-  gap: 0; /* Kein Abstand zwischen den Buttons */
+  gap: 0;
   flex: 0 0 auto;
 }
 
-/* Map-Buttons: Zusammengeschweißt ohne Innenabrundung */
 .ornitho-map-btn {
   display: flex;
   align-items: center;
   justify-content: center;
   background-color: #2f9e44;
   color: white;
-
   flex: 0 0 auto;
-  width: 38px;
-  min-width: 32px;
-  max-width: 80px;
-
-  padding: 0 8px;
-  border-radius: 0; /* Standardmäßig alle Ecken eckig */
+  width: calc(38px * var(--zoom-factor));
+  min-width: calc(32px * var(--zoom-factor));
+  max-width: calc(80px * var(--zoom-factor));
+  padding: 0 calc(8px * var(--zoom-factor));
+  border-radius: 0;
   border: none;
-  border-right: 1px solid #2b8a3e; /* Feine Trennlinie zwischen den Buttons */
+  border-right: 1px solid #2b8a3e;
   cursor: pointer;
-  font-size: 11px;
+  font-size: calc(11px * var(--zoom-factor));
   font-weight: 700;
   letter-spacing: 0.5px;
   transition: background-color 0.2s;
 }
 
-/* Nur ganz links abrunden */
 .ornitho-map-btn:first-child {
-  border-top-left-radius: 6px;
-  border-bottom-left-radius: 6px;
+  border-top-left-radius: calc(6px * var(--zoom-factor));
+  border-bottom-left-radius: calc(6px * var(--zoom-factor));
 }
 
-/* Nur ganz rechts abrunden und dort die Trennlinie entfernen */
 .ornitho-map-btn:last-child {
-  border-top-right-radius: 6px;
-  border-bottom-right-radius: 6px;
+  border-top-right-radius: calc(6px * var(--zoom-factor));
+  border-bottom-right-radius: calc(6px * var(--zoom-factor));
   border-right: none;
 }
 
@@ -140,12 +139,11 @@ button {
   background-color: #2b8a3e;
 }
 
-/* Link-Button */
 #openLocationBtn {
-  width: 38px;
-  min-width: 38px;
-  max-width: 38px;
-  flex: 0 0 38px;
+  width: calc(38px * var(--zoom-factor));
+  min-width: calc(38px * var(--zoom-factor));
+  max-width: calc(38px * var(--zoom-factor));
+  flex: 0 0 calc(38px * var(--zoom-factor));
   padding: 0;
   background-color: #2f9e44;
   color: white;
@@ -158,8 +156,8 @@ button {
   background-color: #69db7c;
   color: white;
   width: 100%;
-  padding: 6px 14px;
-  font-size: 13px;
+  padding: calc(6px * var(--zoom-factor)) calc(14px * var(--zoom-factor));
+  font-size: calc(13px * var(--zoom-factor));
 }
 #linkBtn:hover {
   background-color: #51cf66;
@@ -185,21 +183,21 @@ button {
   top: 11px;
   right: 4px;
   cursor: pointer;
-  font-size: 18px;
+  font-size: calc(18px * var(--zoom-factor));
   user-select: none;
 }
 
 #settingsMenu {
   background: #fff;
   border: 1px solid #ccc;
-  border-radius: 6px;
-  width:  300px;
-  max-height: 600px;
+  border-radius: calc(6px * var(--zoom-factor));
+  width: calc(300px * var(--zoom-factor));
+  max-height: calc(600px * var(--zoom-factor));
   overflow-y: auto;
-  padding: 10px;
+  padding: calc(10px * var(--zoom-factor));
   position: absolute;
   right: 0;
-  top: 40px;
+  top: calc(40px * var(--zoom-factor));
   display: none;
   z-index: 1000;
   box-shadow: 0 4px 12px rgba(0,0,0,0.15);
@@ -209,13 +207,13 @@ button {
 }
 
 .settings-section-title {
-  font-size: 13px;
+  font-size: calc(13px * var(--zoom-factor));
   font-weight: 700;
   text-transform: uppercase;
   color: #555;
-  margin: 12px 0 6px 4px;
+  margin: calc(12px * var(--zoom-factor)) 0 calc(6px * var(--zoom-factor)) calc(4px * var(--zoom-factor));
   border-bottom: 1px solid #eee;
-  padding-bottom: 2px;
+  padding-bottom: calc(2px * var(--zoom-factor));
 }
 .settings-section-title:first-of-type {
   margin-top: 0;
@@ -224,15 +222,15 @@ button {
 #settingsMenu label.settings-item {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: calc(2px * var(--zoom-factor));
   cursor: pointer;
-  padding: 4px 8px;
+  padding: calc(4px * var(--zoom-factor)) calc(8px * var(--zoom-factor));
 }
 
 #settingsMenu label.settings-item .checkbox-title-row {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: calc(8px * var(--zoom-factor));
 }
 
 #settingsMenu label.settings-item input[type="checkbox"] {
@@ -242,20 +240,20 @@ button {
 
 #settingsMenu label.settings-item .settings-title {
   font-weight: 600;
-  font-size: 13px;
+  font-size: calc(13px * var(--zoom-factor));
   line-height: 1.2;
 }
 
 #highCountString {
-  font-size: 13px;
-  height: 24px;
-  padding: 1.5px 6px 1px 6px;
+  font-size: calc(13px * var(--zoom-factor));
+  height: calc(24px * var(--zoom-factor));
+  padding: calc(1.5px * var(--zoom-factor)) calc(6px * var(--zoom-factor));
   margin-top: 0;
   flex: 1;
 }
 
 #settingsMenu label.settings-item .settings-desc {
-  font-size: 12px;
+  font-size: calc(12px * var(--zoom-factor));
   color: #666;
   line-height: 1.3;
   margin: 0;
@@ -265,37 +263,38 @@ button {
 .checkbox-title-row {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: calc(8px * var(--zoom-factor));
 }
 
 .settings-title {
   font-weight: 600;
-  font-size: 13px;
+  font-size: calc(13px * var(--zoom-factor));
 }
 
 .settings-desc {
-  font-size: 12px;
+  font-size: calc(12px * var(--zoom-factor));
   color: #666;
   line-height: 1.3;
-  padding-left: 21px;
+  padding-left: calc(21px * var(--zoom-factor));
 }
 
-.settings-input {
+.settings-input, .settings-select {
   width: 100%;
-  padding: 6px;
-  border-radius: 4px;
+  padding: calc(6px * var(--zoom-factor));
+  border-radius: calc(4px * var(--zoom-factor));
   border: 1px solid #ccc;
-  font-size: 12px;
-  margin-top: 4px;
+  font-size: calc(12px * var(--zoom-factor));
+  margin-top: calc(4px * var(--zoom-factor));
+  background: #fff;
 }
 
 .library-box {
   width: 100%;
-  height: 60px;
+  height: calc(60px * var(--zoom-factor));
   font-family: monospace;
-  font-size: 11px;
-  padding: 6px;
-  border-radius: 4px;
+  font-size: calc(11px * var(--zoom-factor));
+  padding: calc(6px * var(--zoom-factor));
+  border-radius: calc(4px * var(--zoom-factor));
   border: 1px solid #ccc;
   resize: vertical;
   background: #fafafa;
@@ -303,18 +302,18 @@ button {
 
 .library-btn-row {
   display: flex;
-  gap: 4px;
-  margin-top: 4px;
-  margin-bottom: 8px;
+  gap: calc(4px * var(--zoom-factor));
+  margin-top: calc(4px * var(--zoom-factor));
+  margin-bottom: calc(8px * var(--zoom-factor));
 }
 
 .settings-btn {
-  padding: 6px 10px;
-  font-size: 11px;
-  border-radius: 4px;
+  padding: calc(6px * var(--zoom-factor)) calc(10px * var(--zoom-factor));
+  font-size: calc(11px * var(--zoom-factor));
+  border-radius: calc(4px * var(--zoom-factor));
   font-weight: bold;
-  height: 29px;
-  line-height: 17px;
+  height: calc(29px * var(--zoom-factor));
+  line-height: calc(17px * var(--zoom-factor));
 }
 
 .btn-secondary {
@@ -333,27 +332,25 @@ button {
   background: #2b8a3e;
 }
 
-
-
 /* =========================
    Datenkarten
    ========================= */
 .data-card {
   background: white;
-  border-radius: 10px;
-  padding: 18px 20px;
+  border-radius: calc(10px * var(--zoom-factor));
+  padding: calc(18px * var(--zoom-factor)) calc(20px * var(--zoom-factor));
   box-shadow: 0 3px 8px rgba(0,0,0,0.08);
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: calc(12px * var(--zoom-factor));
 }
 
 .data-item {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  gap: 12px;
-  font-size: 14px;
+  gap: calc(12px * var(--zoom-factor));
+  font-size: calc(14px * var(--zoom-factor));
 }
 
 .data-item .value {
@@ -368,12 +365,12 @@ button {
 }
 
 .comment {
-  font-size: 13px;
+  font-size: calc(13px * var(--zoom-factor));
   color: #333;
   background: #f1f5f9;
-  padding: 10px;
-  border-radius: 6px;
-  max-height: 30px;
+  padding: calc(10px * var(--zoom-factor));
+  border-radius: calc(6px * var(--zoom-factor));
+  max-height: calc(30px * var(--zoom-factor));
   overflow-y: auto;
   white-space: pre-wrap;
   font-style: italic;
@@ -396,20 +393,21 @@ button {
    Sprache Auswahl
    ========================= */
 #languageRow {
-  margin-top: -7px;
-  margin-left: 3px;
+  margin-top: calc(-7px * var(--zoom-factor));
+  margin-left: calc(3px * var(--zoom-factor));
+  align-items: center;
 }
 #languageSelect {
-  margin-top: 3px;
+  margin-top: calc(3px * var(--zoom-factor));
   appearance: none;
-  padding: 6px 28px 6px 10px;
-  border-radius: 6px;
+  padding: calc(6px * var(--zoom-factor)) calc(28px * var(--zoom-factor)) calc(6px * var(--zoom-factor)) calc(10px * var(--zoom-factor));
+  border-radius: calc(6px * var(--zoom-factor));
   border: 1px solid #ccc;
-  font-size: 13px;
+  font-size: calc(13px * var(--zoom-factor));
   background-color: #fff;
   background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 20 20'><polygon points='0,0 20,0 10,12' fill='%23666'/></svg>");
   background-repeat: no-repeat;
-  background-position: right 8px center;
+  background-position: right calc(8px * var(--zoom-factor)) center;
   cursor: pointer;
 }
 
@@ -423,20 +421,20 @@ button {
    ========================= */
 #failedSpeciesList,
 #failedAtlasList {
-  padding: 8px 10px;
-  gap: 4px;
-  font-size: 12.5px;
+  padding: calc(8px * var(--zoom-factor)) calc(10px * var(--zoom-factor));
+  gap: calc(4px * var(--zoom-factor));
+  font-size: calc(12.5px * var(--zoom-factor));
   color: #b00000;
 }
 #failedSpeciesList strong,
 #failedAtlasList strong {
-  font-size: 12.5px;
+  font-size: calc(12.5px * var(--zoom-factor));
   font-weight: 600;
 }
 #failedSpeciesItems,
 #failedAtlasItems {
   line-height: 1.2;
-  font-size: 12.5px;
+  font-size: calc(12.5px * var(--zoom-factor));
 }
 
 /* =========================
@@ -446,17 +444,17 @@ button {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  padding: 6px 10px;
-  gap: 4px;
-  font-size: 13px;
-  margin-top: -5px;
-  margin-left: -5px;
+  padding: calc(6px * var(--zoom-factor)) calc(10px * var(--zoom-factor));
+  gap: calc(4px * var(--zoom-factor));
+  font-size: calc(13px * var(--zoom-factor));
+  margin-top: calc(-5px * var(--zoom-factor));
+  margin-left: calc(-5px * var(--zoom-factor));
 }
 
 .switch {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: calc(8px * var(--zoom-factor));
   cursor: pointer;
   user-select: none;
 }
@@ -467,20 +465,20 @@ button {
 
 .slider {
   position: relative;
-  width: 40px;
-  height: 20px;
+  width: calc(40px * var(--zoom-factor));
+  height: calc(20px * var(--zoom-factor));
   background-color: #ccc;
-  border-radius: 20px;
+  border-radius: calc(20px * var(--zoom-factor));
   transition: 0.2s;
 }
 
 .slider::before {
   content: "";
   position: absolute;
-  width: 16px;
-  height: 16px;
-  left: 2px;
-  top: 2px;
+  width: calc(16px * var(--zoom-factor));
+  height: calc(16px * var(--zoom-factor));
+  left: calc(2px * var(--zoom-factor));
+  top: calc(2px * var(--zoom-factor));
   background: white;
   border-radius: 50%;
   transition: 0.2s;
@@ -491,11 +489,11 @@ button {
 }
 
 .switch input:checked + .slider::before {
-  transform: translateX(20px);
+  transform: translateX(calc(20px * var(--zoom-factor)));
 }
 
 .switch-label {
-  font-size: 13px;
+  font-size: calc(13px * var(--zoom-factor));
 }
 
 /* =========================
@@ -506,17 +504,17 @@ button {
   bottom: 0;
   left: 0;
   right: 0;
-  height: 20px;
+  height: calc(20px * var(--zoom-factor));
   background: #f2f2f2;
   border-top: 1px solid #ccc;
-  font-size: 9px;
+  font-size: calc(9px * var(--zoom-factor));
   font-weight: normal;
   color: #666;
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 999;
-  padding: 0 6px;
+  padding: 0 calc(6px * var(--zoom-factor));
 }
 
 #footer span {
@@ -525,31 +523,48 @@ button {
 
 #footer-center {
   display: flex;
-  gap: 1px;
+  gap: calc(1px * var(--zoom-factor));
   align-items: center;
 }
 
 #footer-right {
   position: absolute;
-  right: 6px;
+  right: calc(6px * var(--zoom-factor));
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: calc(8px * var(--zoom-factor));
 }
 
-#extensionsLinkBtn {
-  background: none;
-  border: none;
+/* Etwas prominentere Zoom-Buttons im Footer */
+#footer-zoom {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: calc(4px * var(--zoom-factor));
+}
+
+.zoom-footer-btn {
+  background: #e2e8f0;
+  border: 1px solid #cbd5e1;
+  border-radius: calc(3px * var(--zoom-factor));
   margin: 0;
-  padding: 0;
-  color: #818080;
+  padding: 0 calc(5px * var(--zoom-factor));
+  color: #334155;
   cursor: pointer;
-  font-size: 11px;
-  line-height: 1;
+  font-size: calc(11px * var(--zoom-factor));
+  line-height: calc(14px * var(--zoom-factor));
+  font-weight: bold;
 }
 
-#extensionsLinkBtn:hover {
+.zoom-footer-btn:hover {
+  background: #cbd5e1;
   color: #1c7ed6;
+}
+
+.plus-symbol {
+  display: inline-block;
+  position: relative;
+  top: calc(1px * var(--zoom-factor));
 }
 
 #bugReportFooter {
@@ -564,23 +579,14 @@ button {
 }
 
 #bugReportFooter svg {
-  width: 12px;
-  height: 12px;
-}
-
-.external-link-icon {
-  display: inline-flex;
-  align-items: baseline;
-  margin-left: 4px;
-  color: #818080;
-  text-decoration: none;
-  transform: translate(-2px, 0.8px); /* Hier nach Belieben anpassen, z.B. translate(1px, -2px) */
+  width: calc(12px * var(--zoom-factor));
+  height: calc(12px * var(--zoom-factor));
 }
 
 .external-link-icon {
   display: inline-flex;
   align-items: center;
-  margin-left: 4px;
+  margin-left: calc(4px * var(--zoom-factor));
   color: #000;
   text-decoration: none;
   vertical-align: baseline;
@@ -623,22 +629,22 @@ button {
       </div>
     </label>
 
-<label class="settings-item">
-  <div class="checkbox-title-row">
-    <input type="checkbox" id="useAtlasCodesCT">
-    <div class="settings-title">
-      Brutzeitcodes C und T übernehmen
-      <a href="https://support.ebird.org/de/support/solutions/articles/48000837520-brutzeit-und-verhaltenscodes-in-ebird#anchorDefinitions" target="_blank" title="Definitionen ansehen" class="external-link-icon">
-        <svg viewBox="0 0 24 24" width="11" height="11">
-          <path fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14L21 3"/>
-        </svg>
-      </a>
-    </div>
-  </div>
-  <div class="settings-desc">
-    Je nach Ornitho-Portal sollte diese Option nur aktiviert sein, wenn die Codes für das Verhalten von PAAREN verwendet werden.
-  </div>
-</label>
+    <label class="settings-item">
+      <div class="checkbox-title-row">
+        <input type="checkbox" id="useAtlasCodesCT">
+        <div class="settings-title">
+          Brutzeitcodes C und T übernehmen
+          <a href="https://support.ebird.org/de/support/solutions/articles/48000837520-brutzeit-und-verhaltenscodes-in-ebird#anchorDefinitions" target="_blank" title="Definitionen ansehen" class="external-link-icon">
+            <svg viewBox="0 0 24 24" width="11" height="11">
+              <path fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14L21 3"/>
+            </svg>
+          </a>
+        </div>
+      </div>
+      <div class="settings-desc">
+        Je nach Ornitho-Portal sollte diese Option nur aktiviert sein, wenn die Codes für das Verhalten von PAAREN verwendet werden.
+      </div>
+    </label>
 
     <label class="settings-item">
       <div class="checkbox-title-row">
@@ -741,7 +747,6 @@ button {
       Metadaten einfügen
     </button>
 
-    <!-- Container für dynamische Länder-Karten-Buttons -->
     <div id="ornithoMapBtnContainer"></div>
 
     <button id="openLocationBtn"
@@ -781,14 +786,16 @@ button {
   </div>
 </main>
 
-
 <div id="footer">
   <div id="footer-center">
     <span id="extensionVersion"></span>
     <span>© Florian Hatt</span>
   </div>
   <div id="footer-right">
-    <button id="extensionsLinkBtn" title="Erweiterungen verwalten">🛠</button>
+    <div id="footer-zoom">
+  <button id="zoomOutBtn" class="zoom-footer-btn" title="Verkleinern">-</button>
+  <button id="zoomInBtn" class="zoom-footer-btn" title="Vergrößern"><span class="plus-symbol">+</span></button>
+    </div>
     <a href="https://github.com/FlorianH27/ebird2ornitho/issues" target="_blank" title="Bug melden" id="bugReportFooter">
       <svg viewBox="0 0 292 310" width="12" height="12">
         <path d="M146 22 A48 48 0 0 1 194 70 L194 90 L98 90 L98 70 A48 48 0 0 1 146 22 Z" fill="currentColor"/>
