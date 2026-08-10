@@ -22,6 +22,7 @@ Stand: August 2026
 Diese Datenschutzerklärung klärt Sie darüber auf, wie die Browser-Erweiterung ebird2ornitho mit Daten umgeht.
 
 1. Datenerhebung und -speicherung 
+
    Die Erweiterung verarbeitet Daten ausschließlich lokal auf Ihrem Endgerät.
 
    Es werden keinerlei personenbezogenen Daten an externe Server oder Dritte übertragen.
@@ -29,7 +30,9 @@ Diese Datenschutzerklärung klärt Sie darüber auf, wie die Browser-Erweiterung
    Zur Bereitstellung der Funktionen (wie Benutzereinstellungen oder lokaler Zwischenspeicher) werden Daten temporär im lokalen Speicher Ihres Browsers (chrome.storage.local) abgelegt. Diese verbleiben ausschließlich auf Ihrem Computer und können jederzeit durch das Deinstallieren der Erweiterung gelöscht werden.
 
 2. Berechtigungen
-Die Erweiterung benötigt nur die technisch notwendigen Berechtigungen, um im Sidepanel zu funktionieren und die jeweiligen Portale im Browser zu unterstützen. Es werden keine Browser-Verläufe oder privaten Daten erfasst.
 
-3. Kontakt
-Bei Fragen zum Datenschutz können Sie sich an folgende E-Mail-Adresse wenden: ebird2ornitho@gmail.com
+   Die Erweiterung benötigt nur die technisch notwendigen Berechtigungen, um im Sidepanel zu funktionieren und die jeweiligen Portale im Browser zu unterstützen. Es werden keine Browser-Verläufe oder privaten Daten erfasst.
+
+3. Kontakt 
+
+   Bei Fragen zum Datenschutz können Sie sich an folgende E-Mail-Adresse wenden: ebird2ornitho@gmail.com
