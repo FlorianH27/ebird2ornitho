@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "ebird2ornitho",
   "version": "3.0.0",
-  "description": "ebird2ornitho kann Daten von eBird Checklisten erfassen und beim Melden von Listen auf Biolovision-Portalen wieder eingefügen.",
+  "description": "ebird2ornitho erfasst Beobachtungen von eBird-Checklisten und fügt sie auf Biolovision-Portalen wieder ein.",
 
   "permissions": [
     "activeTab",
@@ -77,9 +77,13 @@
   ],
 
   "action": {
-    "default_title": "eBird2ornitho",
-    "default_icon": "icon.png"
-  },
+  "default_title": "eBird2ornitho",
+  "default_icon": {
+    "16": "icon16.png",
+    "48": "icon48.png",
+    "128": "icon128.png"
+  }
+},
 
   "icons": {
   "16": "icon16.png",

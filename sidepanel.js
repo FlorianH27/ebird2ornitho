@@ -737,11 +737,11 @@ async function init() {
   document.getElementById("transferSpeciesBtn")?.addEventListener("click", () => { if (card) card.style.display = "flex"; });
 
   chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-    if (message.action === "getAtlasMap" && message.country) {
-      getAtlasMap(message.country).then(sendResponse);
-      return true;
-    }
-  });
+  if (message.action === "getAtlasMap" && message.country) {
+    const result = getAtlasMap(message.country);
+    sendResponse(result);
+  }
+});
 
   updateLinkButton();
   updateTransferButton();
