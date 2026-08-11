@@ -456,7 +456,10 @@ async function insertMetadata() {
     const result = await chrome.tabs.sendMessage(tab.id, { action: "fillFromStorage" });
     setStatus(result?.success ? "Metadaten erfolgreich eingefügt" : "Metadaten einfügen fehlgeschlagen");
   } catch(error) {
-    setStatus("Fehler beim Einfügen");
+    const statusEl = document.getElementById("status");
+    if (statusEl?.textContent !== "Arten werden eingefügt...") {
+      setStatus("Fehler beim Einfügen der Metadaten");
+    }
   }
 }
 
