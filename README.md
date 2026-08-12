@@ -47,6 +47,5 @@ Diese Datenschutzerklärung klärt Sie darüber auf, wie die Browser-Erweiterung
 
 
 ## Anleitung Auto-Downloader App für macOS erstellen
-Dieser Abschnitt wird bald gelöscht, da er für die neuste Version im Chrome Web Store nicht mehr relevant ist.
+Dieser Abschnitt wird bald gelöscht, da er für die neuste Version im Chrome Web Store (siehe oben) nicht mehr relevant ist.
 
-Siehe oben.
