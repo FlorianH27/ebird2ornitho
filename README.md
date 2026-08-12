@@ -48,4 +48,5 @@ Diese Datenschutzerklärung klärt Sie darüber auf, wie die Browser-Erweiterung
 
 ## Anleitung Auto-Downloader App für macOS erstellen
 Dieser Abschnitt wird bald gelöscht, da er für die neuste Version im Chrome Web Store nicht mehr relevant ist.
+
 Siehe https://github.com/FlorianH27/ebird2ornitho/blob/main/README.md#installation
