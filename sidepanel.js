@@ -541,7 +541,6 @@ async function updateTransferButton(forcedUrl = null) {
 
   try {
     let url = forcedUrl || (await chrome.tabs.query({ active: true, lastFocusedWindow: true }))[0]?.url || "";
-
     if (!url || url.startsWith("chrome://") || url.startsWith("edge://") || url === "about:blank") {
       if (transferButton) transferButton.style.display = "none";
       if (emptySpeciesCard) emptySpeciesCard.style.display = "none";
@@ -550,13 +549,15 @@ async function updateTransferButton(forcedUrl = null) {
       return;
     }
 
-    const isCurrentStateDaily = url.includes("index.php?m_id=1423&wizard_current_state=daily");
-    const displayStyle = isCurrentStateDaily ? "flex" : "none";
+    const isOldPattern = url.includes("index.php?m_id=1423&wizard_current_state=daily");
+    const isNewPattern = /wizard_id=\d+.*wizard_target=daily_list/.test(url);
+    const isValid = isOldPattern || isNewPattern;
+    const displayStyle = isValid ? "flex" : "none";
 
-    if (transferButton) transferButton.style.display = isCurrentStateDaily ? "block" : "none";
+    if (transferButton) transferButton.style.display = isValid ? "block" : "none";
     if (emptySpeciesCard) emptySpeciesCard.style.display = displayStyle;
 
-    if (!isCurrentStateDaily) {
+    if (!isValid) {
       if (failedAtlasList) failedAtlasList.style.display = "none";
       if (failedSpeciesList) failedSpeciesList.style.display = "none";
     }
