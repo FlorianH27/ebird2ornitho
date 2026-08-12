@@ -1,5 +1,9 @@
 # ebird2ornitho
 
+## Installation
+
+ebird2ornitho ist jetzt im Chrome-Webstore erhältlich und lässt sich auf Chrome, Edge und Ecosia (und evtl. weiteren Browsern) installieren!
+https://chromewebstore.google.com/detail/gahhagbacnohljcfbfmcjoffkfomfnoc?utm_source=item-share-cb
 
 
 ## Bedienungsanleitung
