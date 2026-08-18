@@ -341,46 +341,20 @@ async function lockUI(remoteVersion) {
         Änderungsprotokoll (Changelog) ansehen &rarr;
       </a>
 
-      <div style="background: #eef6ff; border: 1px solid #3b82f6; border-radius: 8px; padding: 14px; margin: 16px 0; text-align: left;">
-        <strong style="font-size: 13px; color: #1d4ed8; display: block; margin-bottom: 8px;">Anleitung Update:</strong>
-
-        <ol style="font-size: 12px; color: #1e293b; margin: 0; padding-left: 18px; line-height: 1.5;">
-          <li>
-            <b>Lokalen Ordner der Erweiterung öffnen</b><br>
-            <span style="font-size: 11px; color: #475569;">
-               Lokalen Ordner öffnen, in dem die Erweiterung gespeichert wurde. Falls der Speicherort unbekannt ist, bei
-<button id="openDetailsBtn" style="display: inline; width: auto; background: none; border: none; padding: 0; color: #2563eb; text-decoration: underline; cursor: pointer; font-size: 11px; vertical-align: baseline;">Details</button>                   neben <b>Geladen aus</b> den Dateipfad nachschauen.
-            </span>
-          </li>
-          <li style="margin-top: 6px;">
-            <b>Im lokalen Ordner den Downloader öffnen</b>
-            <ul style="margin: 2px 0 0 0; padding-left: 16px; font-size: 11px;">
-              <li><b>Windows:</b> <code>auto-downloader-windows.bat</code></li>
-              <li>
-                <b>macOS:</b> <code>auto-downloader-macOS.app</code><br>
-                <span style="font-size: 10px; color: #64748b;">
-                  (<b>Hinweis macOS:</b> Falls auto-downloader-macOS.app fehlt, muss dieser einmalig selbst erstellt werden – <a href="https://github.com/FlorianH27/ebird2ornitho/blob/main/README.md#anleitung-auto-downloader-app-f%C3%BCr-macos-erstellen" target="_blank" style="color: #2563eb;">Anleitung</a>)
-                </span>
-              </li>
-            </ul>
-          </li>
-          <li style="margin-top: 6px;">
-            <b>Erweiterung neu laden</b><br>
-            <span style="font-size: 11px; color: #475569;">
-<button id="openExtPageBtn" style="display: inline; width: auto; background: none; border: none; padding: 0; color: #2563eb; text-decoration: underline; cursor: pointer; font-size: 11px; vertical-align: baseline;">Erweiterungen verwalten</button>              → bei ebird2ornitho auf <b>Erneut laden</b> (Kreis-Symbol) klicken
-            </span>
-          </li>
-        </ol>
+      <div style="background: #f0fdf4; border: 1px solid #22c55e; border-radius: 8px; padding: 14px; margin: 16px 0; text-align: left;">
+        <strong style="font-size: 13px; color: #166534; display: block; margin-bottom: 8px;">ebird2ornitho ist jetzt im Chrome Web Store erhältlich.</strong>
+        <span style="font-size: 11px; color: #15803d; display: block; line-height: 1.5; margin-bottom: 10px;">
+          Die Erweiterung kann von dort aus auf Chrome, Edge und Ecosia installiert werden. Die bisherige lokale Version wird nicht weiter entwickelt.
+        </span>
+        <a href="https://chromewebstore.google.com/detail/gahhagbacnohljcfbfmcjoffkfomfnoc?utm_source=item-share-cb" target="_blank" style="display: inline-block; background: #16a34a; color: #ffffff; padding: 8px 12px; font-size: 12px; font-weight: 600; border-radius: 6px; text-decoration: none; text-align: center; width: 100%; box-sizing: border-box;">
+          Zum Chrome Web Store
+        </a>
       </div>
 
-      <a href="https://github.com/FlorianH27/ebird2ornitho/blob/main/README.md#update" target="_blank" style="font-size: 12px; text-decoration: underline;">
-        Anleitung online öffnen
-      </a>
-
       <div style="background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; padding: 12px; margin: 16px 0; text-align: left;">
-        <span style="font-size: 12px; font-weight: bold; color: #000; display: block; margin-bottom: 4px;">Optional: Location Library Backup</span>
+        <span style="font-size: 12px; font-weight: bold; color: #000; display: block; margin-bottom: 4px;">Location Library kopieren</span>
         <span style="font-size: 11px; color: #475569; display: block; margin-bottom: 8px;">
-          Alle Daten bleiben beim Update erhalten. Optional kann die Location-Library kopiert und nach dem Update in den Einstellungen wieder eingefügt werden:
+          Falls die Location Library erhalten bleiben soll, muss sie hier kopiert werden und kann später in der neuen Version in den Einstellungen wieder eingefügt werden.
         </span>
         <button id="copyLocationBtn" style="background: #ffffff; color: #334155; border: 1px solid #cbd5e1; padding: 6px 10px; font-size: 11px; font-weight: 600; border-radius: 4px; width: 100%; cursor: pointer;">
           Library in Zwischenablage kopieren
@@ -390,28 +364,13 @@ async function lockUI(remoteVersion) {
       ${remaining > 0 ? `
         <div style="margin-top: 20px; border-top: 1px solid #f1f5f9; padding-top: 14px;">
           <button id="unlockOnceBtn" style="background: transparent; color: #94a3b8; border: 1px solid #e2e8f0; padding: 8px 12px; font-size: 12px; border-radius: 6px; cursor: pointer;">
-            Update überspringen
+            Hinweis überspringen
           </button>
         </div>
       ` : ""}
     </div>
   `;
   document.body.appendChild(overlay);
-
-  // Link 1: Details öffnen
-  document.getElementById("openDetailsBtn").addEventListener("click", () => {
-    const extId = chrome.runtime.id;
-    try {
-      chrome.tabs.create({ url: `chrome://extensions/?id=${extId}` });
-    } catch (err) {
-      chrome.tabs.create({ url: "chrome://extensions" });
-    }
-  });
-
-  // Link 2: Erweiterungen verwalten öffnen
-  document.getElementById("openExtPageBtn").addEventListener("click", () => {
-    chrome.tabs.create({ url: "chrome://extensions" });
-  });
 
   // Location Backup kopieren
   document.getElementById("copyLocationBtn").addEventListener("click", async (e) => {

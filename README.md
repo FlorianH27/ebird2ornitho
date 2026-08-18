@@ -1,39 +1,13 @@
 # ebird2ornitho
 
-## Installation 
-(Auf Microsoft Edge, Google Chrome und Ecosia erfolgreich getestet, funktioniert NICHT auf Firefox oder Safari)
+## Installation
 
-1. Source code (zip) herunterladen (https://github.com/FlorianH27/ebird2ornitho/releases)
-2. zip-Ordner extrahieren und in einem beliebigen Ordner abspeichern
-3. Browser → Erweiterungen → Erweiterungen verwalten → Entwicklermodus aktivieren → Entpackte Dateien laden → Ordner auswählen → fertig
-4. Optional: Kann im Browser für schnelleren Zugriff an Symbolleiste gepinnt werden
+ebird2ornitho ist jetzt im Chrome Web Store erhältlich und lässt sich auf Chrome, Edge und Ecosia (und evtl. weiteren Browsern) installieren!
+Diese Erweiterung ist NICHT kompatibel mit Firefox oder Safari.
+https://chromewebstore.google.com/detail/gahhagbacnohljcfbfmcjoffkfomfnoc?utm_source=item-share-cb
 
 ## Update
-
-### Empfohlen: Auto-Downloader nutzen
-1. **Lokalen Ordner der Erweiterung öffnen**  
-   *(Falls der Speicherort unbekannt ist: Im Browser unter **Erweiterungen** → **Erweiterungen verwalten** bei ebird2ornitho auf **Details** klicken und den Dateipfad neben **Geladen aus** ablesen)*
-2. **Auto-Downloader öffnen**
-   
-   *Wichtig: Der Auto-Downloader muss sich im Lokalen Ordner der Erweiterung befinden*
-   * **Windows:** Doppelklick auf `auto-downloader-windows.bat`
-   * **macOS:** Doppelklick auf `auto-downloader-macOS.app`  
-     *(Hinweis macOS: Falls die App fehlt, muss sie einmalig erstellt werden – siehe [Anleitung für macOS](#anleitung-auto-downloader-app-für-macos-erstellen))*
-4. **Erweiterung neu laden**  
-   Browser → **Erweiterungen** → **Erweiterungen verwalten** → bei ebird2ornitho auf **Erneut laden** (Kreis-Symbol) klicken
-
-
-### Alternative: Manuelles Update
-Falls der Auto-Downloader nicht ausgeführt werden kann, lässt sich das Update auch manuell durchführen:
-1. Source code (zip) herunterladen (https://github.com/FlorianH27/ebird2ornitho/releases)
-2. zip-Ordner extrahieren
-3. Alle Dateien aus dem neu extrahierten Ordner kopieren
-4. Speicherort der alten Erweiterungs-Dateien öffnen  
-   *(Falls der Speicherort unbekannt ist: Im Browser unter **Erweiterungen** → **Erweiterungen verwalten** bei ebird2ornitho auf **Details** klicken und den Dateipfad neben **Geladen aus** ablesen)*
-5. Alte Dateien durch die neuen Dateien ersetzen
-6. Browser → Erweiterungen → Erweiterungen verwalten → bei ebird2ornitho auf **Erneut laden** (Kreis-Symbol) klicken
-
-*Hinweis: Alle Daten (inkl. Location Library) bleiben bei beiden Update-Methoden erhalten. Optional kann die Location Library vor dem Update in den Einstellungen der Erweiterung kopiert und anschliessend wieder eingefügt werden.*
+Updates erfolgen automatisch über den Chrome Web Store
 
 ## Bedienungsanleitung
 
@@ -50,19 +24,28 @@ Falls der Auto-Downloader nicht ausgeführt werden kann, lässt sich das Update 
 9. Wie gewohnt speichern → fertig!
 
 
+## Datenschutzerklärung
+
+Stand: August 2026
+
+Diese Datenschutzerklärung klärt Sie darüber auf, wie die Browser-Erweiterung ebird2ornitho mit Daten umgeht.
+
+1. Datenerhebung und -speicherung 
+
+   Die Erweiterung verarbeitet Daten ausschließlich lokal auf Ihrem Endgerät.
+
+   Es werden keinerlei personenbezogenen Daten an externe Server oder Dritte übertragen.
+
+   Zur Bereitstellung der Funktionen (wie Benutzereinstellungen oder lokaler Zwischenspeicher) werden Daten temporär im lokalen Speicher Ihres Browsers (chrome.storage.local) abgelegt. Diese verbleiben ausschließlich auf Ihrem Computer und können jederzeit durch das Deinstallieren der Erweiterung gelöscht werden.
+
+2. Berechtigungen
+
+   Die Erweiterung benötigt nur die technisch notwendigen Berechtigungen, um im Sidepanel zu funktionieren und die jeweiligen Portale im Browser zu unterstützen. Es werden keine Browser-Verläufe oder privaten Daten erfasst.
+
+3. Kontakt 
+
+   Bei Fragen zum Datenschutz können Sie sich an folgende E-Mail-Adresse wenden: ebird2ornitho@gmail.com
+
+
 ## Anleitung Auto-Downloader App für macOS erstellen
-
-Da macOS das Ausführen unsignierter Apps aus Sicherheitsgründen einschränkt, muss der Auto-Downloader für macOS einmalig selbst erstellt werden:
-
-1. Auf dem Mac die App **Skript-Editor** (Script Editor) öffnen (zu finden über die Spotlight-Suche mit `Cmd + Leertaste`).
-2. "Neues Dokument" anklicken
-3. Den Inhalt der Datei <a href="https://github.com/FlorianH27/ebird2ornitho/blob/main/raw-downloader-macOS.txt" target="_blank"><code>raw-downloader-macOS.txt</code></a> in das neue leere Dokument einfügen.
-4. Im Menü oben auf **Ablage** → **Exportieren...** klicken.
-5. Folgende Einstellungen wählen:
-   * **Exportieren als:** `auto-downloader-macOS`
-   * **Ort:** Eigenen ebird2ornitho-Ordner auswählen
-   * **Dateiformat:** **App** (Program)
-   * **Optionen:** Alle deaktivieren
-   * **Codesignatur:** **Zum lokalen ausführen signieren**
-6. Auf **Sichern** klicken. Die erstellte `auto-downloader-macOS.app` kann ab sofort für den Download von Updates per Doppelklick genutzt werden.
-7. Der Skript-Editor kann ohne weitere Dokumente zu speichern wieder geschlossen werden.
+Dieser Abschnitt wird bald gelöscht, da er für die neuste Version im Chrome Web Store (siehe oben) nicht mehr relevant ist.
