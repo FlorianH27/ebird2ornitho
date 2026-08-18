@@ -3,7 +3,9 @@
 ## Installation
 
 ebird2ornitho ist jetzt im Chrome Web Store erhältlich und lässt sich auf Chrome, Edge und Ecosia (und evtl. weiteren Browsern) installieren!
+
 Diese Erweiterung ist NICHT kompatibel mit Firefox oder Safari.
+
 https://chromewebstore.google.com/detail/gahhagbacnohljcfbfmcjoffkfomfnoc?utm_source=item-share-cb
 
 ## Update
