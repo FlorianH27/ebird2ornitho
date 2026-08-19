@@ -9,7 +9,7 @@ Diese Erweiterung ist NICHT kompatibel mit Firefox oder Safari.
 https://chromewebstore.google.com/detail/gahhagbacnohljcfbfmcjoffkfomfnoc?utm_source=item-share-cb
 
 ## Update
-Updates erfolgen automatisch über den Chrome Web Store.
+Updates erfolgen automatisch über den Chrome Web Store (siehe oben).
 
 ## Bedienungsanleitung
 
