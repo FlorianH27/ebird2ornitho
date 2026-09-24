@@ -336,11 +336,23 @@ async function transferSpecies(speciesData) {
         const highStr = (highCountOpts.highCountString || '').trim();
 
         if (commentOpts.includeComments) {
-          if (
-            highCountOpts.enableHighCountString &&
-            highStr.length > 0 &&
-            comment.toLowerCase().includes(highStr.toLowerCase())
-          ) {
+          let shouldClearComment = false;
+          if (highCountOpts.enableHighCountString && highStr.length > 0) {
+            const terms = highStr.split(",").map(t => t.trim()).filter(Boolean);
+            const lowerComment = comment.toLowerCase();
+
+            shouldClearComment = terms.some(term => {
+              // Prüfen, ob der Begriff in Anführungszeichen steht
+              if (term.startsWith('"') && term.endsWith('"') && term.length >= 2) {
+                const exactTerm = term.slice(1, -1).toLowerCase();
+                return lowerComment === exactTerm;
+              } else {
+                return lowerComment.includes(term.toLowerCase());
+              }
+            });
+          }
+
+          if (shouldClearComment) {
             textarea.value = '';
           } else {
             textarea.value = comment;

@@ -8,9 +8,9 @@ let strassentaubeEnabled = true;
 // ------------------------------------------------------
 // Kleine Hilfsfunktionen (Storage & UI)
 // ------------------------------------------------------
-function setStatus(text) {
+function setStatus(html) {
   const el = document.getElementById("status");
-  if (el) el.textContent = text;
+  if (el) el.innerHTML = html;
 }
 
 function getStorage(keys) {
@@ -39,16 +39,27 @@ function initSettingsMenu() {
   const settingsMenu = document.getElementById("settingsMenu");
   if (!settingsIcon || !settingsMenu) return;
 
+  const closeSettings = () => {
+    settingsMenu.style.display = "none";
+    document.querySelectorAll(".settings-desc-box").forEach(box => {
+      box.style.display = "none";
+    });
+  };
+
   settingsIcon.addEventListener("click", event => {
     event.stopPropagation();
     const isVisible = settingsMenu.style.display === "block";
-    settingsMenu.style.display = isVisible ? "none" : "block";
-    if (!isVisible) refreshLibraryDisplay();
+    if (isVisible) {
+      closeSettings();
+    } else {
+      settingsMenu.style.display = "block";
+      refreshLibraryDisplay();
+    }
   });
 
   document.addEventListener("click", event => {
     if (!settingsMenu.contains(event.target) && event.target !== settingsIcon) {
-      settingsMenu.style.display = "none";
+      closeSettings();
     }
   });
 }
@@ -323,6 +334,15 @@ function showData(data) {
     speciesEl.innerHTML = `<span class="${recognized === speciesList.length && speciesList.length > 0 ? "green" : "red"}">${recognized}</span>`;
   }
 
+  if (recognized === 0 && speciesList.length > 0) {
+      setStatus('Keine Art gefunden <span id="statusHelp" style="cursor:pointer; font-weight:bold; margin-left:4px;" title="Hinweis anzeigen">[?]</span>');
+      document.getElementById("statusHelp")?.addEventListener("click", () => {
+        alert('Keine Art gefunden: Häufige Ursache ist eine falsche Sprachauswahl bei "Unterarten extrahieren". Prüfe die Einstellung oder deaktiviere die ganze Unterarten-Option.');
+      });
+    } else {
+      setStatus("Daten erfolgreich extrahiert");
+    }
+
   const debug = document.getElementById("speciesDebug");
   if (debug) debug.textContent = JSON.stringify(speciesList, null, 2);
 }
@@ -411,7 +431,6 @@ async function extractEbirdData() {
     showData(data);
     await setStorage({ ebirdData: data, speciesData: speciesWithCodes });
     updateOpenLocationButton();
-    setStatus("Daten erfolgreich extrahiert");
   } catch(error) {
     console.error("eBird Extraktion Fehler:", error);
     setStatus("Fehler beim Auslesen");
@@ -466,8 +485,14 @@ async function insertMetadata() {
 async function transferSpecies() {
   const filterCheckbox = document.getElementById("toggleEmptySpecies");
   if (filterCheckbox && filterCheckbox.checked) {
-    filterCheckbox.checked = false;
+    filterCheckbox.checked = false
     filterCheckbox.dispatchEvent(new Event("change"));
+  }
+
+  filterCheckbox.disabled = true;
+  const switchLabel = document.querySelector('.switch-label');
+  if (switchLabel) {
+    switchLabel.style.color = '#888888';
   }
 
   setStatus("Arten werden eingefügt...");
@@ -502,6 +527,12 @@ async function transferSpecies() {
   } catch(error) {
     setStatus("Arten einfügen fehlgeschlagen");
   }
+
+  filterCheckbox.disabled = false;
+  if (switchLabel) {
+    switchLabel.style.color = '#111111';
+  }
+
 }
 
 async function updateLinkButton(forcedUrl = null) {
@@ -699,6 +730,22 @@ function initSpeciesFilter() {
     });
   });
 }
+
+document.querySelectorAll(".help-circle-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    const targetId = btn.getAttribute("data-target");
+    const descBox = document.getElementById(targetId);
+    if (!descBox) return;
+
+    const isVisible = descBox.style.display === "block";
+
+    document.querySelectorAll(".settings-desc-box").forEach(box => {
+      box.style.display = "none";
+    });
+
+    descBox.style.display = isVisible ? "none" : "block";
+  });
+});
 
 function initActionButtons() {
   document.getElementById("extractBtn")?.addEventListener("click", extractEbirdData);
