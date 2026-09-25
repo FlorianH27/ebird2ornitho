@@ -1,5 +1,7 @@
 // ------------------ Atlascode CSV laden ------------------
-let atlasMapCache = {};
+if (typeof atlasMapCache === 'undefined') {
+    var atlasMapCache = {};
+}
 
 async function loadAtlasMap(country) {
     if (atlasMapCache[country]) return atlasMapCache[country];
@@ -26,7 +28,6 @@ async function loadAtlasMap(country) {
 async function setAtlasCode(specieEl, breedingCode, country, isLast = false) {
     if (!breedingCode) return null;
 
-    // 1. Hole das zentrale settings-Objekt aus dem Chrome Storage
     const data = await chrome.storage.local.get('useAtlasCodesCT');
     const useCT = data.useAtlasCodesCT ?? true;
 
@@ -37,13 +38,10 @@ async function setAtlasCode(specieEl, breedingCode, country, isLast = false) {
         return null;
     }
 
-    console.log(eBirdLetter, useCT, !useCT && (eBirdLetter === 'C' || eBirdLetter === 'T'));
-
     if (!useCT && (eBirdLetter === 'C' || eBirdLetter === 'T')) {
-        return false; // Bricht ab, sodass der Code nicht eingetragen wird
+        return false;
     }
 
-    // 4. Weiter wie gehabt
     const map = await loadAtlasMap(country);
     const ornithoCode = map[eBirdLetter];
 
@@ -52,96 +50,72 @@ async function setAtlasCode(specieEl, breedingCode, country, isLast = false) {
     }
 
     if (["1", "2", "3"].includes(ornithoCode)) {
-        
-        // Dem Svelte-Framework 150ms Zeit geben, die Boxen im DOM aufzubauen
         await new Promise(resolve => setTimeout(resolve, 70));
-        
-        // Suche gezielt nach dem fettgedruckten Text, der NICHT der Vogelname ist.
-        // Wir nutzen dafür den CSS-Selektor :not(), um die Klasse .bird_name auszuschließen.
+
         const allBoldElements = specieEl.querySelectorAll('b');
         let requiredNotice = null;
-        
+
         for (const b of allBoldElements) {
             if (!b.closest('.bird_name')) {
                 requiredNotice = b;
                 break;
             }
         }
-        
-        const requiredKeywords = ["erforderlich", "mandatory", "nécessaire", "necessario"];
 
-        // Validierung, ob der gefundene fettgedruckte Text die Pflichtfeld-Keywords enthält
+        const requiredKeywords = ["erforderlich", "mandatory", "nécessaire", "necessario"];
         const isRequired = requiredNotice && requiredKeywords.some(k =>
             requiredNotice.textContent.toLowerCase().includes(k.toLowerCase())
         );
 
         if (!isRequired) {
             console.log(`[AtlasCode] Code ${ornithoCode} wird übersprungen – Kein Pflichtfeld für diese Art.`);
-            return null; // Wenn kein Pflichtfeld, überspringen (gewollt für 1-3)
-        } else {
-            console.log(`[AtlasCode] Code ${ornithoCode} wird gesetzt – Pflichtfeld erkannt!`);
+            return null;
         }
     }
 
     const hiddenInput = specieEl.querySelector('input[type="hidden"][name*="[atlas_code]"]');
-        const dropdownBtn = specieEl.querySelector('button.bx--list-box__field');
+    const dropdownBtn = specieEl.querySelector('button.bx--list-box__field');
 
-        if (hiddenInput && dropdownBtn) {
-            // 1. Wert setzen und Standard-Events feuern
-            hiddenInput.value = ornithoCode;
-            hiddenInput.dispatchEvent(new Event('input', { bubbles: true }));
-            hiddenInput.dispatchEvent(new Event('change', { bubbles: true }));
+    if (hiddenInput && dropdownBtn) {
+        hiddenInput.value = ornithoCode;
+        hiddenInput.dispatchEvent(new Event('input', { bubbles: true }));
+        hiddenInput.dispatchEvent(new Event('change', { bubbles: true }));
 
-            // 2. Dropdown absolut sicher öffnen (mit mousedown + click kombiniert, da Frameworks da penibel sind)
-            dropdownBtn.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }));
-            dropdownBtn.click();
-            
-            // 3. Dem Framework genug Zeit geben, das Menü im DOM aufzubauen
-            await new Promise(resolve => setTimeout(resolve, 100));
+        dropdownBtn.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }));
+        dropdownBtn.click();
 
-            // 4. Den Eintrag über seinen Textinhalt suchen (robuster als Klassen/IDs)
-            // Carbon nutzt oft '.bx--list-box__menu-item__option' oder Rollen wie 'option'
-            const menuOptions = Array.from(document.querySelectorAll('.bx--list-box__menu-item, [role="option"], .bx--dropdown-item'));
-            
-            // Wir suchen das Item, dessen Text exakt mit unserem Code startet oder ihn enthält
-            const menuItem = menuOptions.find(el => {
-                const text = el.textContent.trim();
-                // Matcht z.B. wenn im Menü "B3 - Sicherer Brutnachweis" oder nur "B3" steht
-                return text === ornithoCode || text.startsWith(ornithoCode + ' ') || text.startsWith(ornithoCode + '\t');
-            });
-            
-            if (menuItem) {
-                // Eintrag auswählen
-                menuItem.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }));
-                menuItem.click();
-                
-                // Zeit für die Verarbeitung geben
-                await new Promise(resolve => setTimeout(resolve, 60));
-            } else {
-                console.warn(`[AtlasCode] Menü-Text für Code "${ornithoCode}" wurde im geöffneten Dropdown nicht gefunden.`);
-                
-                // Plan B: Wenn das Menü partout nicht will, zwingen wir Svelte über ein Custom Event zur Aktualisierung
-                dropdownBtn.dispatchEvent(new CustomEvent('select', { 
-                    detail: { item: { id: ornithoCode, value: ornithoCode } },
-                    bubbles: true 
-                }));
-            }
+        await new Promise(resolve => setTimeout(resolve, 100));
 
-            // 5. Wenn es das letzte Element war, das Dropdown wieder schließen
-            if (isLast) {
-                dropdownBtn.click();
-            }
+        const menuOptions = Array.from(document.querySelectorAll('.bx--list-box__menu-item, [role="option"], .bx--dropdown-item'));
+        const menuItem = menuOptions.find(el => {
+            const text = el.textContent.trim();
+            return text === ornithoCode || text.startsWith(ornithoCode + ' ') || text.startsWith(ornithoCode + '\t');
+        });
 
-            return true;
+        if (menuItem) {
+            menuItem.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }));
+            menuItem.click();
+            await new Promise(resolve => setTimeout(resolve, 60));
+        } else {
+            console.warn(`[AtlasCode] Menü-Text für Code "${ornithoCode}" wurde im geöffneten Dropdown nicht gefunden.`);
+            dropdownBtn.dispatchEvent(new CustomEvent('select', {
+                detail: { item: { id: ornithoCode, value: ornithoCode } },
+                bubbles: true
+            }));
         }
+
+        if (isLast) {
+            dropdownBtn.click();
+        }
+
+        return true;
+    }
     return true;
 }
-
 
 // ------------------ Hilfsfunktion: Auswahl-Overlay anzeigen ------------------
 function showSpeciesSelectionOverlay(speciesName, birdIdsArray) {
     return new Promise((resolve) => {
-        // Filtere vorab alle IDs heraus, zu denen im DOM absolut kein Name gefunden werden kann
         const validIds = birdIdsArray.map(id => id.trim()).filter(cleanId => {
             const li = document.querySelector(`#species_box li[id="${cleanId}"]`);
             if (li && (li.getAttribute('value_name') || li.innerText.trim())) return true;
@@ -152,13 +126,11 @@ function showSpeciesSelectionOverlay(speciesName, birdIdsArray) {
             return false;
         });
 
-        // Wenn keine einzige gültige Option im DOM existiert, abbrechen
         if (validIds.length === 0) {
             resolve(null);
             return;
         }
 
-        // Wenn genau eine Option übrig bleibt, diese sofort automatisch wählen
         if (validIds.length === 1) {
             resolve(validIds[0]);
             return;
@@ -187,7 +159,6 @@ function showSpeciesSelectionOverlay(speciesName, birdIdsArray) {
             textAlign: 'center'
         });
 
-        // Extrahiert alles vor der ersten '(' oder '[' und entfernt überflüssige Leerzeichen
         const cleanedSpeciesName = speciesName.split(/[([]/)[0].trim();
 
         box.innerHTML = `
@@ -235,10 +206,10 @@ function showSpeciesSelectionOverlay(speciesName, birdIdsArray) {
                 transition: 'background 0.2s',
                 textAlign: 'left'
             });
-            
+
             btn.addEventListener('mouseenter', () => btn.style.backgroundColor = '#e9ecef');
             btn.addEventListener('mouseleave', () => btn.style.backgroundColor = '#f8f9fa');
-            
+
             btn.addEventListener('click', () => {
                 overlay.remove();
                 resolve(cleanId);
@@ -248,7 +219,26 @@ function showSpeciesSelectionOverlay(speciesName, birdIdsArray) {
     });
 }
 
-// ------------------ Arten übertragen ------------------
+// ------------------ Vogelnamen-Ersetzungssystem ------------------
+function applySpeciesNameMapping(name) {
+    const nameMap = {
+        "Graylag Goose" : "Greylag Goose",
+        "Eurasian/Green-winged Teal": "Green-winged Teal",
+        "Common Scoter": "Black Scoter",
+        "Black Scoter": "American Scoter",
+        "Goosander": "Common Merganser",
+        "Common Woodpigeon" : "Common Wood Pigeon",
+        "Black-throated Diver" : "Black-throated Loon",
+        "Common Raven" : "Northern Raven",
+        "Pied Wagtail/White Wagtail" : "White Wagtail",
+        "Rock Pipit" : "Eurasian Rock Pipit",
+        "Common/Arctic Tern": "Common Tern/Arctic Tern"
+    };
+    const trimmed = name.trim();
+    return nameMap[trimmed] || trimmed;
+}
+
+// ------------------ Arten übertragen (Saubere Unterscheidung) ------------------
 async function transferSpecies(speciesData) {
     let successCount = 0;
     const failedSpecies = [];
@@ -257,19 +247,36 @@ async function transferSpecies(speciesData) {
     let lastSpecieEl = null;
 
     const host = window.location.hostname.toLowerCase();
+    const isArtportalen = host.includes("artportalen.se");
+
     let country = null;
     if (host.includes("ornitho.ch")) country = "CH";
     else if (host.includes("ornitho.it")) country = "CH";
     else if (host.includes("ornitho.de")) country = "DE";
 
     const atlascodesSupported = !!country;
-
-    // Speichert bereits erfolgreich eingefügte birdIDs während dieses Durchlaufs
     const processedBirdIDs = new Set();
 
     for (let i = 0; i < speciesData.length; i++) {
-        const sp = speciesData[i];
+        let sp = speciesData[i];
+        sp.name = applySpeciesNameMapping(sp.name);
 
+        // ==========================================
+        // FALL 1: ARTPORTALEN
+        // ==========================================
+        if (isArtportalen) {
+            const addedViaArtportalen = await addSpeciesArtportalen(sp.name, sp.count);
+            if (!addedViaArtportalen) {
+                failedSpecies.push({ name: sp.name, count: sp.count });
+            } else {
+                successCount++;
+            }
+            continue;
+        }
+
+        // ==========================================
+        // FALL 2: ORNITHO (ELSE)
+        // ==========================================
         let finalBirdID = sp.birdID;
         if (Array.isArray(finalBirdID)) {
             if (finalBirdID.length > 1) {
@@ -284,8 +291,6 @@ async function transferSpecies(speciesData) {
             continue;
         }
 
-        // Wenn diese birdID in diesem Durchlauf bereits verarbeitet wurde,
-        // fügen wir sie direkt der Fehlerliste hinzu, da Ornitho keine Duplikate erlaubt.
         if (processedBirdIDs.has(finalBirdID)) {
             failedSpecies.push({ name: sp.name, count: sp.count });
             continue;
@@ -305,7 +310,6 @@ async function transferSpecies(speciesData) {
             }
         }
 
-        // Markiere diese birdID als erfolgreich hinzugefügt/bearbeitet
         processedBirdIDs.add(finalBirdID);
 
         const totalInput = findTotalInput(specieEl);
@@ -342,7 +346,6 @@ async function transferSpecies(speciesData) {
             const lowerComment = comment.toLowerCase();
 
             shouldClearComment = terms.some(term => {
-              // Prüfen, ob der Begriff in Anführungszeichen steht
               if (term.startsWith('"') && term.endsWith('"') && term.length >= 2) {
                 const exactTerm = term.slice(1, -1).toLowerCase();
                 return lowerComment === exactTerm;
@@ -411,8 +414,6 @@ async function transferSpecies(speciesData) {
         }
     }
 
-    console.log("Gesamt-Fail:", failedSpecies, "Atlas-Fail:", atlasFailedSpecies);
-
     return {
         success: true,
         message: `${successCount} Arten übertragen`,
@@ -450,6 +451,163 @@ function addSpeciesOfficial(birdID) {
     return true;
 }
 
+// ------------------ Artportalen Specific Insertion ------------------
+async function addSpeciesArtportalen(speciesName, targetCount) {
+    const findTargetButton = () => {
+        const taxonEls = Array.from(document.querySelectorAll('.taxon-name'));
+        const taxonEl = taxonEls.find(el => el.textContent.trim().toLowerCase() === speciesName.toLowerCase());
+
+        if (taxonEl) {
+            const container = taxonEl.closest('.adb-panel, app-sighting-input, div');
+            if (container) {
+                const btn = container.querySelector('button.add-quantity, button[id^="addOne_"]');
+                if (btn) return btn;
+            }
+        }
+
+        const buttons = Array.from(document.querySelectorAll('button.add-quantity, button[aria-label]'));
+        let btn = buttons.find(b => {
+            const label = b.getAttribute('aria-label') || '';
+            const namePart = label.replace(/^(Lägg till art|Taxon)\s+/i, '').trim();
+            return namePart.toLowerCase() === speciesName.toLowerCase();
+        });
+
+        return btn || null;
+    };
+
+    let targetButton = findTargetButton();
+
+    if (!targetButton) {
+        const addGlobalBtn = Array.from(document.querySelectorAll('button')).find(b => {
+            const span = b.querySelector('span');
+            return span && span.textContent.trim().toLowerCase() === 'lägg till art';
+        });
+
+        if (addGlobalBtn) {
+            addGlobalBtn.click();
+            await new Promise(resolve => setTimeout(resolve, 400));
+
+            const taxaInput = document.getElementById('taxaInput') || document.querySelector('input[id="taxaInput"]');
+            if (taxaInput) {
+                const setNativeValue = (element, value) => {
+                    const valueSetter = Object.getOwnPropertyDescriptor(element, 'value')?.set;
+                    const prototype = Object.getPrototypeOf(element);
+                    const prototypeValueSetter = Object.getOwnPropertyDescriptor(prototype, 'value')?.set;
+
+                    if (valueSetter && valueSetter !== prototypeValueSetter) {
+                        prototypeValueSetter.call(element, value);
+                    } else if (valueSetter) {
+                        valueSetter.call(element, value);
+                    } else {
+                        element.value = value;
+                    }
+                    element.dispatchEvent(new Event('input', { bubbles: true }));
+                    element.dispatchEvent(new Event('change', { bubbles: true }));
+                };
+
+                setNativeValue(taxaInput, speciesName);
+                await new Promise(resolve => setTimeout(resolve, 600));
+
+                const optionButtons = Array.from(document.querySelectorAll('typeahead-container button[role="option"], .dropdown-menu button, .dropdown-item'));
+                const matchedOption = optionButtons.find(el => {
+                    const text = el.textContent.trim().toLowerCase();
+                    return text.includes(speciesName.toLowerCase());
+                });
+
+                if (matchedOption) {
+                    matchedOption.click();
+                    await new Promise(resolve => setTimeout(resolve, 300));
+                }
+
+                const okButton = document.getElementById('okButton') || document.querySelector('modal-container button.btn-primary');
+                if (okButton) {
+                    okButton.click();
+                    await new Promise(resolve => setTimeout(resolve, 500));
+                }
+            }
+
+            targetButton = findTargetButton();
+        }
+    }
+
+    if (!targetButton) {
+        console.warn(`[Artportalen] Hinzufügen-Button für Art "${speciesName}" wurde nicht gefunden.`);
+        return false;
+    }
+
+    if (targetButton.textContent.trim() === "+") {
+        targetButton.click();
+        await new Promise(resolve => setTimeout(resolve, 250));
+    }
+
+    let container = targetButton.closest('.adb-panel, app-sighting-input, div');
+    const isX = String(targetCount).trim().toUpperCase() === "X";
+
+    if (isX) {
+        let checkboxEl = container ? container.querySelector('#quantityManyCheckbox') : null;
+        if (!checkboxEl) {
+            checkboxEl = document.getElementById('quantityManyCheckbox');
+        }
+
+        if (checkboxEl) {
+            if (!checkboxEl.checked) {
+                checkboxEl.click();
+                checkboxEl.dispatchEvent(new Event('change', { bubbles: true }));
+                checkboxEl.dispatchEvent(new Event('input', { bubbles: true }));
+                await new Promise(resolve => setTimeout(resolve, 100));
+            }
+        } else {
+            let targetNoCountEl = null;
+            if (container) {
+                const clickables = Array.from(container.querySelectorAll('button, span, label, mat-checkbox, input[type="checkbox"]'));
+                targetNoCountEl = clickables.find(el => {
+                    const txt = (el.textContent || el.getAttribute('aria-label') || '').trim().toLowerCase();
+                    return txt.includes("kan inte uppskatta") || txt.includes("can't determine quantity");
+                });
+            }
+
+            if (targetNoCountEl) {
+                targetNoCountEl.click();
+                await new Promise(resolve => setTimeout(resolve, 100));
+            }
+        }
+    } else {
+        let countInput = container ? container.querySelector('input[formcontrolname="quantity"], input[name*="count"], input[id*="quantity"], input[type="number"]') : null;
+
+        if (!countInput) {
+            countInput = document.querySelector('input[formcontrolname="quantity"], input[name*="count"], input[id*="quantity"]');
+        }
+
+        if (countInput) {
+            const setNativeValue = (element, value) => {
+                const valueSetter = Object.getOwnPropertyDescriptor(element, 'value')?.set;
+                const prototype = Object.getPrototypeOf(element);
+                const prototypeValueSetter = Object.getOwnPropertyDescriptor(prototype, 'value')?.set;
+
+                if (valueSetter && valueSetter !== prototypeValueSetter) {
+                    prototypeValueSetter.call(element, value);
+                } else if (valueSetter) {
+                    valueSetter.call(element, value);
+                } else {
+                    element.value = value;
+                }
+                element.dispatchEvent(new Event('input', { bubbles: true }));
+                element.dispatchEvent(new Event('change', { bubbles: true }));
+            };
+
+            setNativeValue(countInput, "");
+            await new Promise(resolve => setTimeout(resolve, 50));
+            setNativeValue(countInput, String(targetCount));
+            countInput.dispatchEvent(new Event('blur', { bubbles: true }));
+            await new Promise(resolve => setTimeout(resolve, 100));
+        } else {
+            console.warn(`[Artportalen] Antal-Feld für Art "${speciesName}" konnte nicht gefunden werden.`);
+        }
+    }
+
+    return true;
+}
+
 function findSpeciesContainer(birdID) {
     return document.querySelector(`.specie[bird_id="${birdID}"]`) ||
            document.querySelector(`div[bird_id="${birdID}"]`);
@@ -476,6 +634,7 @@ function checkConfirmNext() {
 }
 
 (function initBackToTop() {
+    if (window.location.hostname.toLowerCase().includes("artportalen.se")) return;
     if (document.getElementById('back-to-top')) return;
 
     const btn = document.createElement('div');

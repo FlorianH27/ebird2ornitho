@@ -580,13 +580,14 @@ async function updateTransferButton(forcedUrl = null) {
       return;
     }
 
-    const isOldPattern = url.includes("index.php?m_id=1423&wizard_current_state=daily");
-    const isNewPattern = /wizard_id=\d+.*wizard_target=daily_list/.test(url);
-    const isValid = isOldPattern || isNewPattern;
-    const displayStyle = isValid ? "flex" : "none";
+const isOldPattern = url.includes("index.php?m_id=1423&wizard_current_state=daily");
+const isNewPattern = /wizard_id=\d+.*wizard_target=daily_list/.test(url);
+const isArtportalen = url.includes("checklista.artportalen.se/report");
+const isValid = isOldPattern || isNewPattern || isArtportalen;
+const displayStyle = isValid ? "flex" : "none";
 
-    if (transferButton) transferButton.style.display = isValid ? "block" : "none";
-    if (emptySpeciesCard) emptySpeciesCard.style.display = displayStyle;
+if (transferButton) transferButton.style.display = isValid ? "block" : "none";
+if (emptySpeciesCard) emptySpeciesCard.style.display = displayStyle;
 
     if (!isValid) {
       if (failedAtlasList) failedAtlasList.style.display = "none";
