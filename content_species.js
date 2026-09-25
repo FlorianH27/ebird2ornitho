@@ -535,7 +535,8 @@ function applySpeciesNameMapping(name) {
         "Common Raven" : "Northern Raven",
         "Pied Wagtail/White Wagtail" : "White Wagtail",
         "Rock Pipit" : "Eurasian Rock Pipit",
-        "Common/Arctic Tern": "Common Tern/Arctic Tern"
+        "Common/Arctic Tern": "Common Tern/Arctic Tern",
+        "Common Magpie": "Eurasian Magpie"
     };
     const trimmed = name.trim();
     return nameMap[trimmed] || trimmed;
