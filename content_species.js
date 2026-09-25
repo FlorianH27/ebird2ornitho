@@ -1,35 +1,7 @@
 // ============================================================================
-// HILFSFUNKTIONEN & ALLGEMEINES
+// ALLGEMEINE HILFSFUNKTIONEN & LISTENER
 // ============================================================================
 
-// ------------------ Atlascode CSV laden ------------------
-if (typeof atlasMapCache === 'undefined') {
-    var atlasMapCache = {};
-}
-
-async function loadAtlasMap(country) {
-    if (atlasMapCache[country]) return atlasMapCache[country];
-
-    return new Promise((resolve, reject) => {
-        chrome.runtime.sendMessage({ action: "getAtlasMap", country }, map => {
-            if (chrome.runtime.lastError) {
-                console.error("AtlasMap Message Error:", chrome.runtime.lastError.message);
-                reject(chrome.runtime.lastError);
-                return;
-            }
-            if (!map || typeof map !== "object") {
-                console.error("AtlasMap ungültig:", map);
-                reject(new Error("AtlasMap leer oder ungültig"));
-                return;
-            }
-            atlasMapCache[country] = map;
-            resolve(map);
-        });
-    });
-}
-
-
-// ------------------ Listener & Initialisierung ------------------
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     if (msg.action === "transferSpeciesToOrnitho" && Array.isArray(msg.speciesData)) {
         checkConfirmNext();
@@ -42,8 +14,15 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     }
 });
 
+function checkConfirmNext() {
+  const cb = document.getElementById("confirm_next");
+  if (!cb) return;
+
+  cb.checked = true;
+  cb.dispatchEvent(new Event("change", { bubbles: true }));
+}
+
 (function initBackToTop() {
-    if (window.location.hostname.toLowerCase().includes("artportalen.se")) return;
     if (document.getElementById('back-to-top')) return;
 
     const btn = document.createElement('div');
@@ -87,44 +66,231 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
 
 
 // ============================================================================
-// HAUPT-TRANSFER-FUNKTION (URL-ABFRAGE & CASE-UNTERTEILUNG)
+// HAUPT-TRANSFER-FUNKTION (CASE-UNTERTEILUNG)
 // ============================================================================
 
 async function transferSpecies(speciesData) {
-    let successCount = 0;
-    const failedSpecies = [];
-    const atlasFailedSpecies = [];
-
     const host = window.location.hostname.toLowerCase();
     const isArtportalen = host.includes("artportalen.se");
 
-    for (let i = 0; i < speciesData.length; i++) {
-        let sp = speciesData[i];
-        sp.name = applySpeciesNameMapping(sp.name);
+    // ==========================================
+    // CASE 1: ARTPORTALEN
+    // ==========================================
+    if (isArtportalen) {
+        let successCount = 0;
+        const failedSpecies = [];
 
-        // ==========================================
-        // CASE 1: ARTPORTALEN
-        // ==========================================
-        if (isArtportalen) {
-            const addedViaArtportalen = await addSpeciesArtportalen(sp.name, sp.count);
+        for (let i = 0; i < speciesData.length; i++) {
+            let sp = speciesData[i];
+            const mappedName = applySpeciesNameMapping(sp.name);
+            const addedViaArtportalen = await addSpeciesArtportalen(mappedName, sp.count);
             if (!addedViaArtportalen) {
                 failedSpecies.push({ name: sp.name, count: sp.count });
             } else {
                 successCount++;
             }
+        }
+
+        return {
+            success: true,
+            message: `${successCount} Arten übertragen`,
+            failed: failedSpecies,
+            atlasFailed: []
+        };
+    }
+
+    // ==========================================
+    // CASE 2: ORNITHO (Standard)
+    // ==========================================
+    let successCount = 0;
+    const failedSpecies = [];
+    const atlasFailedSpecies = [];
+    let lastSpecieEl = null;
+
+    let country = null;
+    if (host.includes("ornitho.ch")) country = "CH";
+    else if (host.includes("ornitho.it")) country = "CH";
+    else if (host.includes("ornitho.de")) country = "DE";
+
+    const atlascodesSupported = !!country;
+    const processedBirdIDs = new Set();
+
+    for (let i = 0; i < speciesData.length; i++) {
+        const sp = speciesData[i];
+
+        let finalBirdID = sp.birdID;
+        if (Array.isArray(finalBirdID)) {
+            if (finalBirdID.length > 1) {
+                finalBirdID = await showSpeciesSelectionOverlay(sp.name, finalBirdID);
+            } else {
+                finalBirdID = finalBirdID[0] || null;
+            }
+        }
+
+        if (!finalBirdID) {
+            failedSpecies.push({ name: sp.name, count: sp.count });
             continue;
         }
+
+        if (processedBirdIDs.has(finalBirdID)) {
+            failedSpecies.push({ name: sp.name, count: sp.count });
+            continue;
+        }
+
+        let specieEl = findSpeciesContainer(finalBirdID);
+
+        if (!specieEl) {
+            if (!addSpeciesOfficial(finalBirdID)) {
+                failedSpecies.push({ name: sp.name, count: sp.count });
+                continue;
+            }
+            specieEl = findSpeciesContainer(finalBirdID);
+            if (!specieEl) {
+                failedSpecies.push({ name: sp.name, count: sp.count });
+                continue;
+            }
+        }
+
+        processedBirdIDs.add(finalBirdID);
+
+        const totalInput = findTotalInput(specieEl);
+        const select = findEstimationSelect(specieEl);
+        const box = specieEl.querySelector('.box');
+
+        if (!totalInput || !select || !box) {
+            failedSpecies.push({ name: sp.name, count: sp.count });
+            continue;
+        }
+
+        const [highCountOpts, commentOpts] = await Promise.all([
+          new Promise(resolve =>
+            chrome.storage.local.get(
+              { enableHighCountString: false, highCountString: '' },
+              resolve
+            )
+          ),
+          new Promise(resolve =>
+            chrome.storage.local.get({ includeComments: true }, resolve)
+          )
+        ]);
+
+        const textarea = findCommentTextarea(specieEl);
+        if (!textarea) continue;
+
+        let comment = (sp.comment || '').trim();
+        const highStr = (highCountOpts.highCountString || '').trim();
+
+        if (commentOpts.includeComments) {
+          let shouldClearComment = false;
+          if (highCountOpts.enableHighCountString && highStr.length > 0) {
+            const terms = highStr.split(",").map(t => t.trim()).filter(Boolean);
+            const lowerComment = comment.toLowerCase();
+
+            shouldClearComment = terms.some(term => {
+              if (term.startsWith('"') && term.endsWith('"') && term.length >= 2) {
+                const exactTerm = term.slice(1, -1).toLowerCase();
+                return lowerComment === exactTerm;
+              } else {
+                return lowerComment.includes(term.toLowerCase());
+              }
+            });
+          }
+
+          if (shouldClearComment) {
+            textarea.value = '';
+          } else {
+            textarea.value = comment;
+          }
+        } else {
+          textarea.value = '';
+        }
+
+        if (String(sp.count).trim().toUpperCase() === "X") {
+            select.value = "NO_VALUE";
+            select.dispatchEvent(new Event("change", { bubbles: true }));
+            box.classList.add('box_yellow');
+        } else {
+            totalInput.value = sp.count;
+            select.value = "EXACT_VALUE";
+            totalInput.dispatchEvent(new Event("change", { bubbles: true }));
+            totalInput.dispatchEvent(new Event("blur", { bubbles: true }));
+            totalInput.dispatchEvent(new Event("keyup", { bubbles: true }));
+            select.dispatchEvent(new Event("change", { bubbles: true }));
+        }
+
+        const { enableBreedingCodes: breedingEnabled } = await new Promise(resolve =>
+            chrome.storage.local.get({ enableBreedingCodes: false }, resolve)
+        );
+
+        if (breedingEnabled) {
+            if (!atlascodesSupported) {
+                if (!atlasFailedSpecies.some(e => e.message === "Atlascodes für dieses Portal nicht implementiert")) {
+                    atlasFailedSpecies.push({
+                        message: "Atlascodes für dieses Portal nicht implementiert"
+                    });
+                }
+            } else {
+                if (sp.breedingCode) {
+                    const isLast = i === speciesData.length - 1;
+                    const atlasResult = await setAtlasCode(specieEl, sp.breedingCode, country, isLast);
+
+                    if (atlasResult === false) {
+                        atlasFailedSpecies.push({ name: sp.name, count: sp.count, code: sp.breedingCode });
+                    }
+                }
+            }
+        }
+
+        lastSpecieEl = specieEl;
+        successCount++;
     }
+
+    if (lastSpecieEl) {
+        const dropdownBtn = lastSpecieEl.querySelector('button.bx--list-box__field');
+        const menu = lastSpecieEl.querySelector('.bx--list-box__menu');
+        if (dropdownBtn && menu && dropdownBtn.getAttribute('aria-expanded') === 'true') {
+            dropdownBtn.setAttribute('aria-expanded', 'false');
+            menu.style.display = 'none';
+            dropdownBtn.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }));
+        }
+    }
+
+    return {
+        success: true,
+        message: `${successCount} Arten übertragen`,
+        failed: failedSpecies,
+        atlasFailed: atlasFailedSpecies
+    };
 }
 
 
 // ============================================================================
-// ============================================================================
-// ABSCHNITT 1: ORNITHO FUNKTIONALITÄT & HILFSFUNKTIONEN
-// ============================================================================
+// BEREICH A: ORNITHO SPEZIFISCHE FUNKTIONEN
 // ============================================================================
 
-// ------------------ Atlascode setzen (Ornitho) ------------------
+let atlasMapCache = {};
+
+async function loadAtlasMap(country) {
+    if (atlasMapCache[country]) return atlasMapCache[country];
+
+    return new Promise((resolve, reject) => {
+        chrome.runtime.sendMessage({ action: "getAtlasMap", country }, map => {
+            if (chrome.runtime.lastError) {
+                console.error("AtlasMap Message Error:", chrome.runtime.lastError.message);
+                reject(chrome.runtime.lastError);
+                return;
+            }
+            if (!map || typeof map !== "object") {
+                console.error("AtlasMap ungültig:", map);
+                reject(new Error("AtlasMap leer oder ungültig"));
+                return;
+            }
+            atlasMapCache[country] = map;
+            resolve(map);
+        });
+    });
+}
+
 async function setAtlasCode(specieEl, breedingCode, country, isLast = false) {
     if (!breedingCode) return null;
 
@@ -213,7 +379,6 @@ async function setAtlasCode(specieEl, breedingCode, country, isLast = false) {
     return true;
 }
 
-// ------------------ Hilfsfunktion: Auswahl-Overlay anzeigen (Ornitho) ------------------
 function showSpeciesSelectionOverlay(speciesName, birdIdsArray) {
     return new Promise((resolve) => {
         const validIds = birdIdsArray.map(id => id.trim()).filter(cleanId => {
@@ -353,23 +518,11 @@ function findCommentTextarea(container) {
     return container.querySelector('textarea[name^="species["][name$="[comment]"]');
 }
 
-function checkConfirmNext() {
-  const cb = document.getElementById("confirm_next");
-  if (!cb) return;
-
-  cb.checked = true;
-  cb.dispatchEvent(new Event("change", { bubbles: true }));
-}
-
 
 // ============================================================================
-// ============================================================================
-// ============================================================================
-// ABSCHNITT 2: ARTPORTALEN FUNKTIONALITÄT
+// BEREICH B: ARTPORTALEN SPEZIFISCHE FUNKTIONEN (INKL. MAPPING & SUCH-MODAL)
 // ============================================================================
 
-
-// ------------------ Vogelnamen-Ersetzungssystem für Artportalen ------------------
 function applySpeciesNameMapping(name) {
     const nameMap = {
         "Graylag Goose" : "Greylag Goose",
@@ -444,7 +597,7 @@ async function addSpeciesArtportalen(speciesName, targetCount) {
                 setNativeValue(taxaInput, speciesName);
                 await new Promise(resolve => setTimeout(resolve, 600));
 
-                const optionButtons = Array.from(document.querySelectorAll('typeahead-container button[role="option"], .dropdown-menu button, .dropdown-item'));
+                const optionButtons = Array.from(document.querySelectorAll('typeahead-container button[role="option"], .dropdown-menu button, .dropdown-item, button[id^="ngb-typeahead-"]'));
                 const matchedOption = optionButtons.find(el => {
                     const text = el.textContent.trim().toLowerCase();
                     return text.includes(speciesName.toLowerCase());
@@ -543,5 +696,3 @@ async function addSpeciesArtportalen(speciesName, targetCount) {
 
     return true;
 }
-
-
