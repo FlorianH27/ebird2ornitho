@@ -1,3 +1,7 @@
+// ============================================================================
+// HILFSFUNKTIONEN & ALLGEMEINES
+// ============================================================================
+
 // ------------------ Atlascode CSV laden ------------------
 if (typeof atlasMapCache === 'undefined') {
     var atlasMapCache = {};
@@ -24,7 +28,103 @@ async function loadAtlasMap(country) {
     });
 }
 
-// ------------------ Atlascode setzen ------------------
+
+// ------------------ Listener & Initialisierung ------------------
+chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
+    if (msg.action === "transferSpeciesToOrnitho" && Array.isArray(msg.speciesData)) {
+        checkConfirmNext();
+        transferSpecies(msg.speciesData).then(sendResponse).catch(err => {
+            console.error(err);
+            sendResponse({ success: false, message: err.message });
+        });
+        document.activeElement.blur();
+        return true;
+    }
+});
+
+(function initBackToTop() {
+    if (window.location.hostname.toLowerCase().includes("artportalen.se")) return;
+    if (document.getElementById('back-to-top')) return;
+
+    const btn = document.createElement('div');
+    btn.id = 'back-to-top';
+
+    Object.assign(btn.style, {
+        position: 'fixed',
+        bottom: '40px',
+        right: '40px',
+        width: '42px',
+        height: '42px',
+        borderRadius: '50%',
+        background: '#2d2d2d',
+        color: '#fff',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        cursor: 'pointer',
+        zIndex: '9999',
+        boxShadow: '0 2px 8px rgba(0,0,0,0.3)',
+        opacity: '0',
+        transition: 'opacity 0.2s ease'
+    });
+
+    btn.innerHTML = `
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 4l-8 8h5v8h6v-8h5z"/>
+        </svg>
+    `;
+
+    btn.addEventListener('click', () => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
+    document.body.appendChild(btn);
+
+    window.addEventListener('scroll', () => {
+        btn.style.opacity = window.scrollY > 300 ? '1' : '0';
+    });
+})();
+
+
+// ============================================================================
+// HAUPT-TRANSFER-FUNKTION (URL-ABFRAGE & CASE-UNTERTEILUNG)
+// ============================================================================
+
+async function transferSpecies(speciesData) {
+    let successCount = 0;
+    const failedSpecies = [];
+    const atlasFailedSpecies = [];
+
+    const host = window.location.hostname.toLowerCase();
+    const isArtportalen = host.includes("artportalen.se");
+
+    for (let i = 0; i < speciesData.length; i++) {
+        let sp = speciesData[i];
+        sp.name = applySpeciesNameMapping(sp.name);
+
+        // ==========================================
+        // CASE 1: ARTPORTALEN
+        // ==========================================
+        if (isArtportalen) {
+            const addedViaArtportalen = await addSpeciesArtportalen(sp.name, sp.count);
+            if (!addedViaArtportalen) {
+                failedSpecies.push({ name: sp.name, count: sp.count });
+            } else {
+                successCount++;
+            }
+            continue;
+        }
+    }
+}
+
+
+// ============================================================================
+// ============================================================================
+// ABSCHNITT 1: ORNITHO FUNKTIONALITÄT & HILFSFUNKTIONEN
+// ============================================================================
+// ============================================================================
+
+// ------------------ Atlascode setzen (Ornitho) ------------------
 async function setAtlasCode(specieEl, breedingCode, country, isLast = false) {
     if (!breedingCode) return null;
 
@@ -113,7 +213,7 @@ async function setAtlasCode(specieEl, breedingCode, country, isLast = false) {
     return true;
 }
 
-// ------------------ Hilfsfunktion: Auswahl-Overlay anzeigen ------------------
+// ------------------ Hilfsfunktion: Auswahl-Overlay anzeigen (Ornitho) ------------------
 function showSpeciesSelectionOverlay(speciesName, birdIdsArray) {
     return new Promise((resolve) => {
         const validIds = birdIdsArray.map(id => id.trim()).filter(cleanId => {
@@ -219,7 +319,57 @@ function showSpeciesSelectionOverlay(speciesName, birdIdsArray) {
     });
 }
 
-// ------------------ Vogelnamen-Ersetzungssystem ------------------
+function addSpeciesOfficial(birdID) {
+    const idInput = document.getElementById('id_species');
+    if (!idInput) return false;
+    idInput.value = birdID;
+
+    const fastSelect = document.getElementById('fastselectbox');
+    if (fastSelect) {
+        const li = document.querySelector(`#species_box li[id="${birdID}"]`);
+        if (li) fastSelect.value = li.getAttribute('value_name');
+    }
+
+    const addButton = document.querySelector('input[name="add"][type="button"]');
+    if (!addButton) return false;
+    addButton.click();
+    return true;
+}
+
+function findSpeciesContainer(birdID) {
+    return document.querySelector(`.specie[bird_id="${birdID}"]`) ||
+           document.querySelector(`div[bird_id="${birdID}"]`);
+}
+
+function findTotalInput(container) {
+    return container.querySelector('input[name$="[total_number]"]');
+}
+
+function findEstimationSelect(container) {
+    return container.querySelector('select[name$="[estimation_code]"]');
+}
+
+function findCommentTextarea(container) {
+    return container.querySelector('textarea[name^="species["][name$="[comment]"]');
+}
+
+function checkConfirmNext() {
+  const cb = document.getElementById("confirm_next");
+  if (!cb) return;
+
+  cb.checked = true;
+  cb.dispatchEvent(new Event("change", { bubbles: true }));
+}
+
+
+// ============================================================================
+// ============================================================================
+// ============================================================================
+// ABSCHNITT 2: ARTPORTALEN FUNKTIONALITÄT
+// ============================================================================
+
+
+// ------------------ Vogelnamen-Ersetzungssystem für Artportalen ------------------
 function applySpeciesNameMapping(name) {
     const nameMap = {
         "Graylag Goose" : "Greylag Goose",
@@ -238,220 +388,6 @@ function applySpeciesNameMapping(name) {
     return nameMap[trimmed] || trimmed;
 }
 
-// ------------------ Arten übertragen (Saubere Unterscheidung) ------------------
-async function transferSpecies(speciesData) {
-    let successCount = 0;
-    const failedSpecies = [];
-    const atlasFailedSpecies = [];
-
-    let lastSpecieEl = null;
-
-    const host = window.location.hostname.toLowerCase();
-    const isArtportalen = host.includes("artportalen.se");
-
-    let country = null;
-    if (host.includes("ornitho.ch")) country = "CH";
-    else if (host.includes("ornitho.it")) country = "CH";
-    else if (host.includes("ornitho.de")) country = "DE";
-
-    const atlascodesSupported = !!country;
-    const processedBirdIDs = new Set();
-
-    for (let i = 0; i < speciesData.length; i++) {
-        let sp = speciesData[i];
-        sp.name = applySpeciesNameMapping(sp.name);
-
-        // ==========================================
-        // FALL 1: ARTPORTALEN
-        // ==========================================
-        if (isArtportalen) {
-            const addedViaArtportalen = await addSpeciesArtportalen(sp.name, sp.count);
-            if (!addedViaArtportalen) {
-                failedSpecies.push({ name: sp.name, count: sp.count });
-            } else {
-                successCount++;
-            }
-            continue;
-        }
-
-        // ==========================================
-        // FALL 2: ORNITHO (ELSE)
-        // ==========================================
-        let finalBirdID = sp.birdID;
-        if (Array.isArray(finalBirdID)) {
-            if (finalBirdID.length > 1) {
-                finalBirdID = await showSpeciesSelectionOverlay(sp.name, finalBirdID);
-            } else {
-                finalBirdID = finalBirdID[0] || null;
-            }
-        }
-
-        if (!finalBirdID) {
-            failedSpecies.push({ name: sp.name, count: sp.count });
-            continue;
-        }
-
-        if (processedBirdIDs.has(finalBirdID)) {
-            failedSpecies.push({ name: sp.name, count: sp.count });
-            continue;
-        }
-
-        let specieEl = findSpeciesContainer(finalBirdID);
-
-        if (!specieEl) {
-            if (!addSpeciesOfficial(finalBirdID)) {
-                failedSpecies.push({ name: sp.name, count: sp.count });
-                continue;
-            }
-            specieEl = findSpeciesContainer(finalBirdID);
-            if (!specieEl) {
-                failedSpecies.push({ name: sp.name, count: sp.count });
-                continue;
-            }
-        }
-
-        processedBirdIDs.add(finalBirdID);
-
-        const totalInput = findTotalInput(specieEl);
-        const select = findEstimationSelect(specieEl);
-        const box = specieEl.querySelector('.box');
-
-        if (!totalInput || !select || !box) {
-            failedSpecies.push({ name: sp.name, count: sp.count });
-            continue;
-        }
-
-        const [highCountOpts, commentOpts] = await Promise.all([
-          new Promise(resolve =>
-            chrome.storage.local.get(
-              { enableHighCountString: false, highCountString: '' },
-              resolve
-            )
-          ),
-          new Promise(resolve =>
-            chrome.storage.local.get({ includeComments: true }, resolve)
-          )
-        ]);
-
-        const textarea = findCommentTextarea(specieEl);
-        if (!textarea) return;
-
-        let comment = (sp.comment || '').trim();
-        const highStr = (highCountOpts.highCountString || '').trim();
-
-        if (commentOpts.includeComments) {
-          let shouldClearComment = false;
-          if (highCountOpts.enableHighCountString && highStr.length > 0) {
-            const terms = highStr.split(",").map(t => t.trim()).filter(Boolean);
-            const lowerComment = comment.toLowerCase();
-
-            shouldClearComment = terms.some(term => {
-              if (term.startsWith('"') && term.endsWith('"') && term.length >= 2) {
-                const exactTerm = term.slice(1, -1).toLowerCase();
-                return lowerComment === exactTerm;
-              } else {
-                return lowerComment.includes(term.toLowerCase());
-              }
-            });
-          }
-
-          if (shouldClearComment) {
-            textarea.value = '';
-          } else {
-            textarea.value = comment;
-          }
-        } else {
-          textarea.value = '';
-        }
-
-        if (String(sp.count).trim().toUpperCase() === "X") {
-            select.value = "NO_VALUE";
-            select.dispatchEvent(new Event("change", { bubbles: true }));
-            box.classList.add('box_yellow');
-        } else {
-            totalInput.value = sp.count;
-            select.value = "EXACT_VALUE";
-            totalInput.dispatchEvent(new Event("change", { bubbles: true }));
-            totalInput.dispatchEvent(new Event("blur", { bubbles: true }));
-            totalInput.dispatchEvent(new Event("keyup", { bubbles: true }));
-            select.dispatchEvent(new Event("change", { bubbles: true }));
-        }
-
-        const { enableBreedingCodes: breedingEnabled } = await new Promise(resolve =>
-            chrome.storage.local.get({ enableBreedingCodes: false }, resolve)
-        );
-
-        if (breedingEnabled) {
-            if (!atlascodesSupported) {
-                if (!atlasFailedSpecies.some(e => e.message === "Atlascodes für dieses Portal nicht implementiert")) {
-                    atlasFailedSpecies.push({
-                        message: "Atlascodes für dieses Portal nicht implementiert"
-                    });
-                }
-            } else {
-                if (sp.breedingCode) {
-                    const isLast = i === speciesData.length - 1;
-                    const atlasResult = await setAtlasCode(specieEl, sp.breedingCode, country, isLast);
-
-                    if (atlasResult === false) {
-                        atlasFailedSpecies.push({ name: sp.name, count: sp.count, code: sp.breedingCode });
-                    }
-                }
-            }
-        }
-
-        lastSpecieEl = specieEl;
-        successCount++;
-    }
-
-    if (lastSpecieEl) {
-        const dropdownBtn = lastSpecieEl.querySelector('button.bx--list-box__field');
-        const menu = lastSpecieEl.querySelector('.bx--list-box__menu');
-        if (dropdownBtn && menu && dropdownBtn.getAttribute('aria-expanded') === 'true') {
-            dropdownBtn.setAttribute('aria-expanded', 'false');
-            menu.style.display = 'none';
-            dropdownBtn.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }));
-        }
-    }
-
-    return {
-        success: true,
-        message: `${successCount} Arten übertragen`,
-        failed: failedSpecies,
-        atlasFailed: atlasFailedSpecies
-    };
-}
-
-chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
-    if (msg.action === "transferSpeciesToOrnitho" && Array.isArray(msg.speciesData)) {
-        checkConfirmNext();
-        transferSpecies(msg.speciesData).then(sendResponse).catch(err => {
-            console.error(err);
-            sendResponse({ success: false, message: err.message });
-        });
-        document.activeElement.blur();
-        return true;
-    }
-});
-
-function addSpeciesOfficial(birdID) {
-    const idInput = document.getElementById('id_species');
-    if (!idInput) return false;
-    idInput.value = birdID;
-
-    const fastSelect = document.getElementById('fastselectbox');
-    if (fastSelect) {
-        const li = document.querySelector(`#species_box li[id="${birdID}"]`);
-        if (li) fastSelect.value = li.getAttribute('value_name');
-    }
-
-    const addButton = document.querySelector('input[name="add"][type="button"]');
-    if (!addButton) return false;
-    addButton.click();
-    return true;
-}
-
-// ------------------ Artportalen Specific Insertion ------------------
 async function addSpeciesArtportalen(speciesName, targetCount) {
     const findTargetButton = () => {
         const taxonEls = Array.from(document.querySelectorAll('.taxon-name'));
@@ -608,70 +544,4 @@ async function addSpeciesArtportalen(speciesName, targetCount) {
     return true;
 }
 
-function findSpeciesContainer(birdID) {
-    return document.querySelector(`.specie[bird_id="${birdID}"]`) ||
-           document.querySelector(`div[bird_id="${birdID}"]`);
-}
 
-function findTotalInput(container) {
-    return container.querySelector('input[name$="[total_number]"]');
-}
-
-function findEstimationSelect(container) {
-    return container.querySelector('select[name$="[estimation_code]"]');
-}
-
-function findCommentTextarea(container) {
-    return container.querySelector('textarea[name^="species["][name$="[comment]"]');
-}
-
-function checkConfirmNext() {
-  const cb = document.getElementById("confirm_next");
-  if (!cb) return;
-
-  cb.checked = true;
-  cb.dispatchEvent(new Event("change", { bubbles: true }));
-}
-
-(function initBackToTop() {
-    if (window.location.hostname.toLowerCase().includes("artportalen.se")) return;
-    if (document.getElementById('back-to-top')) return;
-
-    const btn = document.createElement('div');
-    btn.id = 'back-to-top';
-
-    Object.assign(btn.style, {
-        position: 'fixed',
-        bottom: '40px',
-        right: '40px',
-        width: '42px',
-        height: '42px',
-        borderRadius: '50%',
-        background: '#2d2d2d',
-        color: '#fff',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        cursor: 'pointer',
-        zIndex: '9999',
-        boxShadow: '0 2px 8px rgba(0,0,0,0.3)',
-        opacity: '0',
-        transition: 'opacity 0.2s ease'
-    });
-
-    btn.innerHTML = `
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M12 4l-8 8h5v8h6v-8h5z"/>
-        </svg>
-    `;
-
-    btn.addEventListener('click', () => {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    });
-
-    document.body.appendChild(btn);
-
-    window.addEventListener('scroll', () => {
-        btn.style.opacity = window.scrollY > 300 ? '1' : '0';
-    });
-})();
