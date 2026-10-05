@@ -307,7 +307,7 @@
         "https://www.ornitho.ch/index.php?m_id=1423*",
         "https://www.faunegeneve.ch/index.php?m_id=1423*"
   ],
-      "js": ["content_ornitho.js"]
+      "js": ["content_metadata.js"]
     },
     {"matches": [
         "https://www.ornitho.at/index.php?m_id=1423*",
