@@ -22,7 +22,10 @@ function checkConfirmNext() {
   cb.dispatchEvent(new Event("change", { bubbles: true }));
 }
 
+// "Back to Top"-Pfeil nur auf Ornitho-Seiten initialisieren
 (function initBackToTop() {
+    const host = window.location.hostname.toLowerCase();
+    if (host.includes("artportalen.se")) return;
     if (document.getElementById('back-to-top')) return;
 
     const btn = document.createElement('div');
@@ -536,7 +539,8 @@ function applySpeciesNameMapping(name) {
         "Pied Wagtail/White Wagtail" : "White Wagtail",
         "Rock Pipit" : "Eurasian Rock Pipit",
         "Common/Arctic Tern": "Common Tern/Arctic Tern",
-        "Common Magpie": "Eurasian Magpie"
+        "Common Magpie": "Eurasian Magpie",
+        "fisktärna/silvertärna": "Ob. fisk-/silvertärna"
     };
     const trimmed = name.trim();
     return nameMap[trimmed] || trimmed;
@@ -596,22 +600,34 @@ async function addSpeciesArtportalen(speciesName, targetCount) {
                 };
 
                 setNativeValue(taxaInput, speciesName);
-                await new Promise(resolve => setTimeout(resolve, 600));
 
-                const optionButtons = Array.from(document.querySelectorAll('typeahead-container button[role="option"], .dropdown-menu button, .dropdown-item, button[id^="ngb-typeahead-"]'));
-                const matchedOption = optionButtons.find(el => {
-                    const text = el.textContent.trim().toLowerCase();
-                    return text.includes(speciesName.toLowerCase());
-                });
-
-                if (matchedOption) {
-                    matchedOption.click();
-                    await new Promise(resolve => setTimeout(resolve, 300));
+                // Aktives Warten (Polling), bis die Dropdown-Optionen im DOM auftauchen
+                let matchedOption = null;
+                for (let attempt = 0; attempt < 15; attempt++) {
+                    await new Promise(resolve => setTimeout(resolve, 150));
+                    const optionButtons = Array.from(document.querySelectorAll(
+                        '[role="option"], .dropdown-menu button, .dropdown-item, button[id^="ngb-typeahead-"], ngb-typeahead-window button, typeahead-container button'
+                    ));
+                    matchedOption = optionButtons.find(el => {
+                        const text = el.textContent.trim().toLowerCase();
+                        return text.includes(speciesName.toLowerCase());
+                    });
+                    if (matchedOption) break;
                 }
 
-                const okButton = document.getElementById('okButton') || document.querySelector('modal-container button.btn-primary');
+                if (matchedOption) {
+                    console.log("[Artportalen] Dropdown-Option gefunden, klicke:", matchedOption.textContent.trim());
+                    matchedOption.click();
+                    matchedOption.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+                    await new Promise(resolve => setTimeout(resolve, 300));
+                } else {
+                    console.warn("[Artportalen] Keine passende Dropdown-Option gefunden für:", speciesName);
+                }
+
+                const okButton = document.getElementById('okButton') || document.querySelector('modal-container button.btn-primary, button.btn-primary');
                 if (okButton) {
                     okButton.click();
+                    okButton.dispatchEvent(new MouseEvent('click', { bubbles: true }));
                     await new Promise(resolve => setTimeout(resolve, 500));
                 }
             }

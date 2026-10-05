@@ -75,7 +75,7 @@ function setComment(text) {
 async function fillArtportalenModal(start) {
   console.log("[Artportalen] fillArtportalenModal gestartet.");
 
-  const modal = document.querySelector('.modal-dialog[role="document"]');
+  const modal = document.querySelector('.modal-dialog[role="document"], .modal-content');
   if (!modal) {
     console.warn("[Artportalen] Kein Modal gefunden.");
     return false;
@@ -100,6 +100,7 @@ async function fillArtportalenModal(start) {
     element.dispatchEvent(new Event('blur', { bubbles: true }));
   };
 
+  // 0. Auf den "Editera"-Button klicken
   const buttons = Array.from(modal.querySelectorAll('button'));
   const editButton = buttons.find(btn => {
     return btn.textContent.includes('Editera') || btn.querySelector('.fa-edit');
@@ -109,12 +110,21 @@ async function fillArtportalenModal(start) {
     console.log("[Artportalen] 'Editera'-Button gefunden, klicke...");
     editButton.click();
     editButton.dispatchEvent(new MouseEvent('click', { bubbles: true }));
-    await new Promise(resolve => setTimeout(resolve, 200));
   } else {
     console.warn("[Artportalen] 'Editera'-Button nicht gefunden.");
   }
 
-  const dateInput = modal.querySelector('#start-date');
+  // 1. Warten, bis die Datums- und Zeit-Inputs nach dem Edit-Klick im DOM erscheinen (max. 2 Sekunden)
+  let dateInput = null;
+  let timeInput = null;
+  for (let i = 0; i < 20; i++) {
+    dateInput = document.querySelector('input#start-date, input[type="date"], input[formcontrolname*="date"]');
+    timeInput = document.querySelector('input#start-time, input[type="time"], input[formcontrolname*="time"]');
+    if (dateInput && timeInput) break;
+    await new Promise(resolve => setTimeout(resolve, 100));
+  }
+
+  // 2. Startdatum setzen
   if (dateInput) {
     const year = start.getFullYear();
     const month = pad(start.getMonth() + 1);
@@ -122,35 +132,45 @@ async function fillArtportalenModal(start) {
     const dateStr = `${year}-${month}-${day}`;
     console.log("[Artportalen] Setze Datum:", dateStr);
     setNativeValue(dateInput, dateStr);
+  } else {
+    console.warn("[Artportalen] Datums-Input-Tag konnte nicht gefunden werden.");
   }
 
-  const timeInput = modal.querySelector('#start-time');
+  // 3. Startzeit setzen
   if (timeInput) {
     const hours = pad(start.getHours());
     const minutes = pad(start.getMinutes());
     const timeStr = `${hours}:${minutes}`;
     console.log("[Artportalen] Setze Zeit:", timeStr);
     setNativeValue(timeInput, timeStr);
-  }
-
-  await new Promise(resolve => setTimeout(resolve, 50));
-
-  const optionNo = modal.querySelector('#optionNo');
-  if (optionNo) {
-    console.log("[Artportalen] Wähle optionNo aus.");
-    optionNo.click();
-    optionNo.dispatchEvent(new MouseEvent('click', { bubbles: true }));
-    optionNo.dispatchEvent(new Event('change', { bubbles: true }));
-    optionNo.dispatchEvent(new Event('input', { bubbles: true }));
+  } else {
+    console.warn("[Artportalen] Zeit-Input-Tag konnte nicht gefunden werden.");
   }
 
   await new Promise(resolve => setTimeout(resolve, 100));
 
-  const okButton = modal.querySelector('#okButton');
+  // 4. Option "optionNo" auswählen
+  const optionNo = document.querySelector('input[type="radio"]#optionNo, input[name="timeOptions"][value="false"]');
+  if (optionNo) {
+    console.log("[Artportalen] Wähle optionNo-Radio-Button aus.");
+    optionNo.click();
+    optionNo.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    optionNo.dispatchEvent(new Event('change', { bubbles: true }));
+    optionNo.dispatchEvent(new Event('input', { bubbles: true }));
+  } else {
+    console.warn("[Artportalen] Radio-Button #optionNo nicht gefunden.");
+  }
+
+  await new Promise(resolve => setTimeout(resolve, 100));
+
+  // 5. Auf den Starten-Button klicken ("okButton")
+  const okButton = document.querySelector('button#okButton, button.btn-primary');
   if (okButton) {
     console.log("[Artportalen] Klicke 'Starta' (okButton).");
     okButton.click();
     okButton.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+  } else {
+    console.warn("[Artportalen] Starta-Button nicht gefunden.");
   }
 
   return true;
