@@ -1,27 +1,41 @@
+// ----------------- Hilfsfunktion: Datum prüfen (älter als 2 Wochen?) -----------------
+function isOlderThanTwoWeeks() {
+    const hiddenDateInput = document.querySelector('input[type="hidden"][name*="[date_obs]"]');
+    if (!hiddenDateInput) return false;
+
+    const parts = hiddenDateInput.value.split(".");
+    if (parts.length !== 3) return false;
+
+    const observationDate = new Date(parts[2], parts[1] - 1, parts[0]);
+    if (isNaN(observationDate.getTime())) return false;
+
+    const diffDays = (new Date() - observationDate) / (1000 * 60 * 60 * 24);
+    return diffDays > 14;
+}
+
 // ----------------- Konfiguration -----------------
-// Liste der Domains, bei denen die Blockade STRIKT sein muss (kein Speichern ohne Brutzeitcode)
 const hardBlockDomains = [
-    "ornitho.it", // Beispiele für Länder, die den CH-Atlascode 1 oder analog kennen
+    "ornitho.it",
     "ornitho.ch"
 ];
 
-// Automatische Prüfung: Wenn in der Liste -> Hardblock. Wenn NICHT in der Liste -> Standard (Softblock).
 const isHardBlockDomain = hardBlockDomains.some(domain => window.location.hostname.includes(domain));
 
-// Interner Speicher für den Zustand
 let lastMissingCount = 0;
 let hasWarned = false;
 
 // ----------------- Prüfen auf fehlende Atlascodes -----------------
 function checkAtlasCodes() {
+    if (isOlderThanTwoWeeks()) {
+        return 0;
+    }
+
     const missing = [];
 
-    // Alle gelben Arten durchgehen
     document.querySelectorAll("div.box_yellow").forEach(yellowBox => {
-        const parent = yellowBox.parentElement; // eine Ebene höher, enthält alle Infos der Art
+        const parent = yellowBox.parentElement;
         if (!parent) return;
 
-        // Mögliche Warntexte für Atlascode
         const atlasTexts = [
             "erforderlich",
             "mandatory",
@@ -30,14 +44,12 @@ function checkAtlasCodes() {
             "brutzeitcode :"
         ];
 
-        // Alle <b>-Elemente innerhalb der Art, die einen dieser Texte enthalten
         const atlasWarnings = Array.from(parent.querySelectorAll("b"))
             .filter(b => {
                 const text = b.textContent.toLowerCase().trim();
                 return atlasTexts.some(t => text.includes(t));
             });
 
-        // Wenn mindestens ein Atlascode-Warntext vorhanden ist
         if (atlasWarnings.length > 0) {
             const noneTexts = [
                 "kein",
@@ -50,16 +62,15 @@ function checkAtlasCodes() {
 
             const anyNone = labels.some(lbl => {
                 const text = lbl.textContent.toLowerCase().trim();
-                return noneTexts.some(t => text.includes(t)); // includes statt ===
+                return noneTexts.some(t => text.includes(t));
             });
 
             if (anyNone) missing.push(parent);
         }
     });
 
-    return missing.length; // Anzahl der gelben Arten, die noch Atlascode brauchen
+    return missing.length;
 }
-
 
 // ----------------- Warnung erstellen -----------------
 function showAtlasWarning() {
@@ -74,8 +85,7 @@ function showAtlasWarning() {
         const container = document.getElementById("submit-full")?.parentNode || document.body;
         container.insertBefore(warning, container.firstChild);
     }
-    
-    // Text passt sich dynamisch an (Standard ist jetzt der Softblock-Hinweis)
+
     if (isHardBlockDomain) {
         warning.textContent = "Bitte alle erforderlichen Atlas-/Brutzeitcodes ausfüllen!";
     } else {
@@ -93,47 +103,41 @@ function insertSaveButtonCheck() {
     const buttons = [document.getElementById("submit-full"), document.getElementById("submit-partial")];
 
     buttons.forEach(btn => {
-        if (!btn || btn.dataset.inserted) return; // nur einmal einfügen
+        if (!btn || btn.dataset.inserted) return;
         btn.dataset.inserted = "true";
 
-        // Original onclick aus Attribut merken
         const originalAttr = btn.getAttribute("onclick");
 
         btn.addEventListener("click", function(e) {
             const missingCount = checkAtlasCodes();
-            
+
             if (missingCount > 0) {
-                // Sicherheitsnetz: Wenn sich die Anzahl der Fehler verändert hat, 
-                // muss der Nutzer zwingend wieder erst einmal gewarnt werden.
                 if (missingCount !== lastMissingCount) {
                     hasWarned = false;
                 }
                 lastMissingCount = missingCount;
 
-                // Wenn es KEINE Hardblock-Domain ist und bereits einmal gewarnt wurde -> Speichern erlauben
                 if (!isHardBlockDomain && hasWarned) {
                     hideAtlasWarning();
-                    hasWarned = false; // Reset für das nächste Mal
-                    
+                    hasWarned = false;
+
                     if (originalAttr) {
                         new Function(originalAttr).call(btn);
                     }
-                    return; 
+                    return;
                 }
 
-                // Erster Klick (oder eben dauerhafte Blockade auf Hardblock-Plattformen)
                 e.preventDefault();
                 showAtlasWarning();
-                
+
                 if (!isHardBlockDomain) {
-                    hasWarned = true; // Merken, dass gewarnt wurde
+                    hasWarned = true;
                 }
             } else {
                 hideAtlasWarning();
                 hasWarned = false;
                 lastMissingCount = 0;
 
-                // Original onclick ausführen
                 if (originalAttr) {
                     new Function(originalAttr).call(btn);
                 }
