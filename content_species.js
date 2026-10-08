@@ -250,6 +250,16 @@ function showSpeciesSelectionOverlay(speciesName, birdIdsArray) {
 
 // ------------------ Arten übertragen ------------------
 async function transferSpecies(speciesData) {
+    // Checklisten-ID direkt beim Übertragen aus dem Storage holen und auf der Seite verankern
+    const storageData = await new Promise(resolve => chrome.storage.local.get('ebirdData', resolve));
+    const currentChecklistId = storageData.ebirdData?.checklistId;
+
+    if (currentChecklistId) {
+        const form = document.querySelector('form') || document.body;
+        form.dataset.ebirdChecklistId = currentChecklistId;
+    }
+
+    // Normal weiter
     let successCount = 0;
     const failedSpecies = [];
     const atlasFailedSpecies = [];

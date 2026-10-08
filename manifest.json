@@ -100,12 +100,10 @@
   },
 
   "content_scripts": [
-    {
-      "matches": ["https://ebird.org/checklist/*"],
+    {"matches": ["https://ebird.org/checklist/*"],
       "js": ["content_ebird.js"]
     },
-    {
-      "matches": [
+    {"matches": [
         "https://www.ornitho.at/index.php?m_id=10*",
         "https://www.fauna.hr/index.php?m_id=10*",
 
@@ -172,8 +170,7 @@
       ],
       "js": ["content_map.js"]
     },
-    {
-      "matches": [
+    {"matches": [
         "https://www.ornitho.at/index.php?m_id=10*",
         "https://www.fauna.hr/index.php?m_id=10*",
 
@@ -241,8 +238,7 @@
       "js": ["content_zoom.js"],
       "world": "MAIN"
     },
-    {
-      "matches": [
+    {"matches": [
         "https://www.ornitho.at/index.php?m_id=1423*",
         "https://www.fauna.hr/index.php?m_id=1423*",
 
@@ -376,8 +372,7 @@
   ],
       "js": ["content_species.js"]
     },
-	{
-      "matches": [
+	{"matches": [
         "https://www.ornitho.at/index.php?m_id=1423*",
         "https://www.fauna.hr/index.php?m_id=1423*",
 
@@ -444,8 +439,7 @@
   ],
       "js": ["content_filter.js"]
     },
-    {
-      "matches": [
+    {"matches": [
     "https://www.ornitho.at/index.php?m_id=1423*",
         "https://www.fauna.hr/index.php?m_id=1423*",
 
@@ -511,7 +505,10 @@
         "https://www.faunegeneve.ch/index.php?m_id=1423*"
   ],
       "js": ["content_check.js"]
+    },
+    {"matches": ["https://ebird.org/checklist/*"],
+      "js": ["content_imported.js"]
     }
-
   ]
 }
+

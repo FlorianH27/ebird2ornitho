@@ -98,6 +98,27 @@ function hideAtlasWarning() {
     if (warning) warning.remove();
 }
 
+// ----------------- Hilfsfunktion: Checklisten-ID sicher aus dem Seitenkontext speichern -----------------
+function saveChecklistIdToStorage() {
+    const form = document.querySelector('form');
+    const checklistId = form?.dataset.ebirdChecklistId;
+
+    if (!checklistId) {
+        console.log("[eBird2Ornitho] Keine verknüpfte Checklisten-ID im Formular gefunden. Keine Speicherung.");
+        return;
+    }
+
+    chrome.storage.local.get(['savedChecklists'], (data) => {
+        let savedList = Array.isArray(data.savedChecklists) ? data.savedChecklists : [];
+        if (!savedList.includes(checklistId)) {
+            savedList.push(checklistId);
+            chrome.storage.local.set({ savedChecklists: savedList }, () => {
+                console.log("[eBird2Ornitho] Checklisten-ID erfolgreich und tab-sicher zur Speicherliste hinzugefügt:", checklistId);
+            });
+        }
+    });
+}
+
 // ----------------- Listener auf Save Buttons -----------------
 function insertSaveButtonCheck() {
     const buttons = [document.getElementById("submit-full"), document.getElementById("submit-partial")];
@@ -121,6 +142,9 @@ function insertSaveButtonCheck() {
                     hideAtlasWarning();
                     hasWarned = false;
 
+                    // ID speichern, da trotz Warnung fortgefahren wird
+                    saveChecklistIdToStorage();
+
                     if (originalAttr) {
                         new Function(originalAttr).call(btn);
                     }
@@ -137,6 +161,9 @@ function insertSaveButtonCheck() {
                 hideAtlasWarning();
                 hasWarned = false;
                 lastMissingCount = 0;
+
+                // ID speichern beim regulären Klick
+                saveChecklistIdToStorage();
 
                 if (originalAttr) {
                     new Function(originalAttr).call(btn);
