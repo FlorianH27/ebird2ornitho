@@ -507,7 +507,8 @@
       "js": ["content_check.js"]
     },
     {"matches": ["https://ebird.org/checklist/*"],
-      "js": ["content_imported.js"]
+      "js": ["content_imported.js"],
+      "run_at": "document_start"
     }
   ]
 }
