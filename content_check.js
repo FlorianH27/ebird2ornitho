@@ -26,10 +26,8 @@ let hasWarned = false;
 
 // ----------------- Prüfen auf fehlende Atlascodes -----------------
 function checkAtlasCodes() {
-    if (isOlderThanTwoWeeks()) {
-        return 0;
-    }
-
+    // Die Prüfung läuft nun immer durch, auch wenn es älter als 2 Wochen ist,
+    // damit die fehlenden Codes korrekt gezählt werden.
     const missing = [];
 
     document.querySelectorAll("div.box_yellow").forEach(yellowBox => {
@@ -73,7 +71,7 @@ function checkAtlasCodes() {
 }
 
 // ----------------- Warnung erstellen -----------------
-function showAtlasWarning() {
+function showAtlasWarning(isSoftBlock) {
     let warning = document.getElementById("atlasWarning");
     if (!warning) {
         warning = document.createElement("div");
@@ -86,10 +84,10 @@ function showAtlasWarning() {
         container.insertBefore(warning, container.firstChild);
     }
 
-    if (isHardBlockDomain) {
-        warning.textContent = "Bitte alle erforderlichen Atlas-/Brutzeitcodes ausfüllen!";
-    } else {
+    if (isSoftBlock) {
         warning.textContent = "Wurden alle erforderlichen Brutzeitcodes ausgefüllt? Nochmaliges Speichern ignoriert diese Warnung";
+    } else {
+        warning.textContent = "Bitte alle erforderlichen Atlas-/Brutzeitcodes ausfüllen!";
     }
 }
 
@@ -131,6 +129,10 @@ function insertSaveButtonCheck() {
 
         btn.addEventListener("click", function(e) {
             const missingCount = checkAtlasCodes();
+            const isOlder = isOlderThanTwoWeeks();
+
+            // Ein echter Hard-Block greift nur auf Hard-Block-Domains, wenn die Beobachtung NICHT älter als 2 Wochen ist
+            const effectiveHardBlock = isHardBlockDomain && !isOlder;
 
             if (missingCount > 0) {
                 if (missingCount !== lastMissingCount) {
@@ -138,7 +140,7 @@ function insertSaveButtonCheck() {
                 }
                 lastMissingCount = missingCount;
 
-                if (!isHardBlockDomain && hasWarned) {
+                if (!effectiveHardBlock && hasWarned) {
                     hideAtlasWarning();
                     hasWarned = false;
 
@@ -152,9 +154,9 @@ function insertSaveButtonCheck() {
                 }
 
                 e.preventDefault();
-                showAtlasWarning();
+                showAtlasWarning(!effectiveHardBlock);
 
-                if (!isHardBlockDomain) {
+                if (!effectiveHardBlock) {
                     hasWarned = true;
                 }
             } else {
