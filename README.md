@@ -47,7 +47,3 @@ Diese Datenschutzerklärung klärt Sie darüber auf, wie die Browser-Erweiterung
 3. Kontakt 
 
    Bei Fragen zum Datenschutz können Sie sich an folgende E-Mail-Adresse wenden: ebird2ornitho@gmail.com
-
-
-## Anleitung Auto-Downloader App für macOS erstellen
-Dieser Abschnitt wird bald gelöscht, da er für die neuste Version im Chrome Web Store (siehe oben) nicht mehr relevant ist.
