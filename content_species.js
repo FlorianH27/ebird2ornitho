@@ -250,6 +250,16 @@ function showSpeciesSelectionOverlay(speciesName, birdIdsArray) {
 
 // ------------------ Arten übertragen ------------------
 async function transferSpecies(speciesData) {
+    // Checklisten-ID direkt beim Übertragen aus dem Storage holen und auf der Seite verankern
+    const storageData = await new Promise(resolve => chrome.storage.local.get('ebirdData', resolve));
+    const currentChecklistId = storageData.ebirdData?.checklistId;
+
+    if (currentChecklistId) {
+        const form = document.querySelector('form') || document.body;
+        form.dataset.ebirdChecklistId = currentChecklistId;
+    }
+
+    // Normal weiter
     let successCount = 0;
     const failedSpecies = [];
     const atlasFailedSpecies = [];
@@ -336,11 +346,23 @@ async function transferSpecies(speciesData) {
         const highStr = (highCountOpts.highCountString || '').trim();
 
         if (commentOpts.includeComments) {
-          if (
-            highCountOpts.enableHighCountString &&
-            highStr.length > 0 &&
-            comment.toLowerCase().includes(highStr.toLowerCase())
-          ) {
+          let shouldClearComment = false;
+          if (highCountOpts.enableHighCountString && highStr.length > 0) {
+            const terms = highStr.split(",").map(t => t.trim()).filter(Boolean);
+            const lowerComment = comment.toLowerCase();
+
+            shouldClearComment = terms.some(term => {
+              // Prüfen, ob der Begriff in Anführungszeichen steht
+              if (term.startsWith('"') && term.endsWith('"') && term.length >= 2) {
+                const exactTerm = term.slice(1, -1).toLowerCase();
+                return lowerComment === exactTerm;
+              } else {
+                return lowerComment.includes(term.toLowerCase());
+              }
+            });
+          }
+
+          if (shouldClearComment) {
             textarea.value = '';
           } else {
             textarea.value = comment;

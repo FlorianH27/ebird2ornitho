@@ -18,6 +18,7 @@ function parseDurationText(text) {
 
 
 // ----------------- eBird Daten Extraktion inkl. Koordinaten und Ortsname -----------------
+// ----------------- eBird Daten Extraktion inkl. Koordinaten und Ortsname -----------------
 function extractEbirdData() {
   try {
     // Startzeit auslesen
@@ -53,7 +54,7 @@ function extractEbirdData() {
     if (mapLink) {
       const query = mapLink.href.split("query=")[1];
       if (query) {
-        const [latStr, lonStr] = query.split(",");
+        const [latStr, lonStr]	= query.split(",");
         lat = parseFloat(latStr);
         lon = parseFloat(lonStr);
       }
@@ -64,6 +65,16 @@ function extractEbirdData() {
     const locationEl = document.querySelector('div.Heading--h3 span:not(.is-visuallyHidden)');
     if (locationEl) locationName = locationEl.textContent.trim();
 
+    // **Checklisten-ID auslesen (sprachenunabhängig über den h1-Heading)**
+    let checklistId = null;
+    const h1El = document.querySelector('div.u-rowFold h1#content, h1.Heading');
+    if (h1El) {
+      const match = h1El.textContent.match(/([A-Z]\d+)/);
+      if (match) {
+        checklistId = match[1];
+      }
+    }
+
     return {
       start: startDate.toISOString(),
       end: endDate.toISOString(),
@@ -71,7 +82,8 @@ function extractEbirdData() {
       displayEnd: endDate.toLocaleTimeString("de-DE", { hour: "2-digit", minute: "2-digit" }),
       comment,
       coordinates: lat !== null && lon !== null ? { lat, lon } : null,
-      location: locationName // <-- neuer Wert
+      location: locationName,
+      checklistId // <-- neuer Wert im Rückgabeobjekt
     };
   } catch (err) {
     console.error("Error extracting eBird data:", err);
@@ -82,7 +94,8 @@ function extractEbirdData() {
       displayEnd: "(kein Datum)",
       comment: "",
       coordinates: null,
-      location: null // <-- fallback
+      location: null,
+      checklistId: null // <-- Fallback
     };
   }
 }

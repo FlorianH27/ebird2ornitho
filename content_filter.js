@@ -15,7 +15,7 @@ function toggleYellowBoxes(checked) {
     });
 
 
-	
+
     // Wenn Checkbox aktiv → automatisch nach oben scrollen
     if (checked) {
         window.scrollTo({ top: 280, behavior: 'smooth' });

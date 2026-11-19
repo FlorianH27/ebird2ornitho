@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "ebird2ornitho",
-  "version": "3.0.1",
-  "description": "Diese Erweiterung ermöglicht es, Daten aus eBird Checklisten zu extrahieren. Diese können danach beim Melden von Beobachtungslisten auf allen Biolovision Portalen wieder im passenden Format eingefügt werden. ",
+  "version": "3.2.0",
+  "description": "ebird2ornitho erfasst Beobachtungen von eBird-Checklisten und fügt sie auf Biolovision-Portalen wieder ein.",
 
   "permissions": [
     "activeTab",
@@ -11,8 +11,7 @@
   ],
 
   "host_permissions": [
-    "https://raw.githubusercontent.com/FlorianH27/ebird2ornitho/*",
-    "https://www.ornitho.at/index.php?m_id=1423*",
+        "https://www.ornitho.at/index.php?m_id=1423*",
         "https://www.fauna.hr/index.php?m_id=1423*",
 
         "http://franche-comte.lpo.fr/index.php?m_id=1423*",
@@ -78,9 +77,19 @@
   ],
 
   "action": {
-    "default_title": "eBird2ornitho",
-    "default_icon": "icon.png"
-  },
+  "default_title": "eBird2ornitho",
+  "default_icon": {
+    "16": "icon16.png",
+    "48": "icon48.png",
+    "128": "icon128.png"
+  }
+},
+
+  "icons": {
+  "16": "icon16.png",
+  "48": "icon48.png",
+  "128": "icon128.png"
+},
 
   "background": {
     "service_worker": "background.js"
@@ -91,12 +100,10 @@
   },
 
   "content_scripts": [
-    {
-      "matches": ["https://ebird.org/checklist/*"],
+    {"matches": ["https://ebird.org/checklist/*"],
       "js": ["content_ebird.js"]
     },
-    {
-      "matches": [
+    {"matches": [
         "https://www.ornitho.at/index.php?m_id=10*",
         "https://www.fauna.hr/index.php?m_id=10*",
 
@@ -163,8 +170,7 @@
       ],
       "js": ["content_map.js"]
     },
-    {
-      "matches": [
+    {"matches": [
         "https://www.ornitho.at/index.php?m_id=10*",
         "https://www.fauna.hr/index.php?m_id=10*",
 
@@ -232,8 +238,7 @@
       "js": ["content_zoom.js"],
       "world": "MAIN"
     },
-    {
-      "matches": [
+    {"matches": [
         "https://www.ornitho.at/index.php?m_id=1423*",
         "https://www.fauna.hr/index.php?m_id=1423*",
 
@@ -298,7 +303,7 @@
         "https://www.ornitho.ch/index.php?m_id=1423*",
         "https://www.faunegeneve.ch/index.php?m_id=1423*"
   ],
-      "js": ["content_ornitho.js"]
+      "js": ["content_metadata.js"]
     },
     {"matches": [
         "https://www.ornitho.at/index.php?m_id=1423*",
@@ -367,8 +372,7 @@
   ],
       "js": ["content_species.js"]
     },
-	{
-      "matches": [
+	{"matches": [
         "https://www.ornitho.at/index.php?m_id=1423*",
         "https://www.fauna.hr/index.php?m_id=1423*",
 
@@ -435,8 +439,7 @@
   ],
       "js": ["content_filter.js"]
     },
-    {
-      "matches": [
+    {"matches": [
     "https://www.ornitho.at/index.php?m_id=1423*",
         "https://www.fauna.hr/index.php?m_id=1423*",
 
@@ -502,7 +505,11 @@
         "https://www.faunegeneve.ch/index.php?m_id=1423*"
   ],
       "js": ["content_check.js"]
+    },
+    {"matches": ["https://ebird.org/checklist/*"],
+      "js": ["content_imported.js"],
+      "run_at": "document_start"
     }
-
   ]
 }
+

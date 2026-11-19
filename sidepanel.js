@@ -1,17 +1,16 @@
 // ======================================================
 // eBird2Ornitho - sidepanel.js
-// Teil 1: Hilfsfunktionen, Settings, Update-System
+// Teil 1: Hilfsfunktionen, Settings
 // ======================================================
 
 let strassentaubeEnabled = true;
-const MAX_UNLOCKS = 10;
 
 // ------------------------------------------------------
 // Kleine Hilfsfunktionen (Storage & UI)
 // ------------------------------------------------------
-function setStatus(text) {
+function setStatus(html) {
   const el = document.getElementById("status");
-  if (el) el.textContent = text;
+  if (el) el.innerHTML = html;
 }
 
 function getStorage(keys) {
@@ -40,16 +39,27 @@ function initSettingsMenu() {
   const settingsMenu = document.getElementById("settingsMenu");
   if (!settingsIcon || !settingsMenu) return;
 
+  const closeSettings = () => {
+    settingsMenu.style.display = "none";
+    document.querySelectorAll(".settings-desc-box").forEach(box => {
+      box.style.display = "none";
+    });
+  };
+
   settingsIcon.addEventListener("click", event => {
     event.stopPropagation();
     const isVisible = settingsMenu.style.display === "block";
-    settingsMenu.style.display = isVisible ? "none" : "block";
-    if (!isVisible) refreshLibraryDisplay();
+    if (isVisible) {
+      closeSettings();
+    } else {
+      settingsMenu.style.display = "block";
+      refreshLibraryDisplay();
+    }
   });
 
   document.addEventListener("click", event => {
     if (!settingsMenu.contains(event.target) && event.target !== settingsIcon) {
-      settingsMenu.style.display = "none";
+      closeSettings();
     }
   });
 }
@@ -263,7 +273,7 @@ libReplaceBtn?.addEventListener("click", () => {
   const inputStr = libImportArea.value.trim();
   if (!inputStr) return;
 
-  if (!confirm("Wirklich alle Verknüpfungen überschreiben?")) return;
+  if (!confirm("Wirklich alle Verknüpfungen in der Location Library überschreiben?")) return;
 
   try {
     const newData = JSON.parse(inputStr);
@@ -278,131 +288,8 @@ libReplaceBtn?.addEventListener("click", () => {
   }
 });
 
-
-
 // ======================================================
-// Teil 4: Update Handling & UI Lock
-// ======================================================
-
-function compareVersions(a, b) {
-  const va = a.split(".").map(Number);
-  const vb = b.split(".").map(Number);
-  const length = Math.max(va.length, vb.length);
-  for (let i = 0; i < length; i++) {
-    const diff = (va[i] || 0) - (vb[i] || 0);
-    if (diff !== 0) return diff;
-  }
-  return 0;
-}
-
-async function checkUpdate() {
-  const manifest = chrome.runtime.getManifest();
-  const localVersion = manifest.version.trim();
-  const statusEl = document.getElementById("status");
-  if (!statusEl) return;
-
-  try {
-    const url = `https://raw.githubusercontent.com/FlorianH27/ebird2ornitho/main/version.json?cb=${Date.now()}`;
-    const res = await fetch(url, { cache: "no-store" });
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-
-    const data = await res.json();
-    const remoteVersion = (data.version || "").trim();
-    if (!remoteVersion) throw new Error("Keine Versionsnummer gefunden");
-
-    if (compareVersions(remoteVersion, localVersion) > 0) {
-      statusEl.innerHTML = `<a href="https://github.com/FlorianH27/ebird2ornitho/releases/latest" target="_blank">Update verfügbar: ${remoteVersion}</a>`;
-      await lockUI(remoteVersion);
-    } else {
-      await chrome.storage.local.remove("unlockAttempts");
-      statusEl.textContent = "Bereit";
-    }
-  } catch (e) {
-    console.error("Update-Check fehlgeschlagen:", e);
-    statusEl.textContent = "Bereit";
-  }
-}
-
-async function lockUI(remoteVersion) {
-  const { unlockAttempts = 0 } = await chrome.storage.local.get("unlockAttempts");
-  const remaining = Math.max(0, MAX_UNLOCKS - unlockAttempts);
-
-  document.querySelectorAll("button").forEach(btn => btn.disabled = true);
-
-  const overlay = document.createElement("div");
-  overlay.id = "update-lock-overlay";
-  overlay.style = "position:fixed; inset:0; background:rgba(255,255,255,0.98); z-index:9999; display:flex; align-items:center; justify-content:center; text-align:center; padding:20px; font-family:sans-serif;";
-
-  overlay.innerHTML = `
-    <div style="max-width: 420px; background: #fff; padding: 24px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.15);">
-      <h2 style="margin-top: 0; margin-bottom: 4px; font-size: 20px; color: #0f172a;">Version ${remoteVersion} verfügbar</h2>
-
-      <a href="https://github.com/FlorianH27/ebird2ornitho/releases/latest" target="_blank" style="display: inline-block; font-size: 11px; color: #2563eb; text-decoration: none; font-weight: 500; margin-bottom: 12px;">
-        Änderungsprotokoll (Changelog) ansehen &rarr;
-      </a>
-
-      <div style="background: #f0fdf4; border: 1px solid #22c55e; border-radius: 8px; padding: 14px; margin: 16px 0; text-align: left;">
-        <strong style="font-size: 13px; color: #166534; display: block; margin-bottom: 8px;">ebird2ornitho ist jetzt im Chrome Web Store erhältlich.</strong>
-        <span style="font-size: 11px; color: #15803d; display: block; line-height: 1.5; margin-bottom: 10px;">
-          Die Erweiterung kann von dort aus auf Chrome, Edge und Ecosia installiert werden. Die bisherige lokale Version wird nicht weiter entwickelt.
-        </span>
-        <a href="https://chromewebstore.google.com/detail/gahhagbacnohljcfbfmcjoffkfomfnoc?utm_source=item-share-cb" target="_blank" style="display: inline-block; background: #16a34a; color: #ffffff; padding: 8px 12px; font-size: 12px; font-weight: 600; border-radius: 6px; text-decoration: none; text-align: center; width: 100%; box-sizing: border-box;">
-          Zum Chrome Web Store
-        </a>
-      </div>
-
-      <div style="background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; padding: 12px; margin: 16px 0; text-align: left;">
-        <span style="font-size: 12px; font-weight: bold; color: #000; display: block; margin-bottom: 4px;">Location Library kopieren</span>
-        <span style="font-size: 11px; color: #475569; display: block; margin-bottom: 8px;">
-          Falls die Location Library erhalten bleiben soll, muss sie hier kopiert werden und kann später in der neuen Version in den Einstellungen wieder eingefügt werden.
-        </span>
-        <button id="copyLocationBtn" style="background: #ffffff; color: #334155; border: 1px solid #cbd5e1; padding: 6px 10px; font-size: 11px; font-weight: 600; border-radius: 4px; width: 100%; cursor: pointer;">
-          Library in Zwischenablage kopieren
-        </button>
-      </div>
-
-      ${remaining > 0 ? `
-        <div style="margin-top: 20px; border-top: 1px solid #f1f5f9; padding-top: 14px;">
-          <button id="unlockOnceBtn" style="background: transparent; color: #94a3b8; border: 1px solid #e2e8f0; padding: 8px 12px; font-size: 12px; border-radius: 6px; cursor: pointer;">
-            Hinweis überspringen
-          </button>
-        </div>
-      ` : ""}
-    </div>
-  `;
-  document.body.appendChild(overlay);
-
-  // Location Backup kopieren
-  document.getElementById("copyLocationBtn").addEventListener("click", async (e) => {
-    e.preventDefault();
-    const btn = e.target;
-    try {
-      const data = await chrome.storage.local.get("locationLinks");
-      const locationString = data.locationLinks ? JSON.stringify(data.locationLinks, null, 2) : "Keine Location-Links im Speicher gefunden.";
-      await navigator.clipboard.writeText(locationString);
-
-      btn.style.background = "#dcfce7"; btn.style.color = "#166534"; btn.style.borderColor = "#86efac"; btn.textContent = "Kopiert!";
-      setTimeout(() => {
-        btn.style.background = "#ffffff"; btn.style.color = "#334155"; btn.style.borderColor = "#cbd5e1"; btn.textContent = "Bibliothek in Zwischenablage kopieren";
-      }, 2000);
-    } catch (err) {
-      btn.textContent = "Fehler beim Kopieren";
-    }
-  });
-
-  // Unlock Button
-  if (remaining > 0) {
-    document.getElementById("unlockOnceBtn").addEventListener("click", async () => {
-      await chrome.storage.local.set({ unlockAttempts: unlockAttempts + 1 });
-      overlay.remove();
-      document.querySelectorAll("button").forEach(btn => btn.disabled = false);
-    });
-  }
-}
-
-
-// ======================================================
-// Teil 5: Datenanzeige, Extraktion & Mapping
+// Teil 4: Datenanzeige, Extraktion & Mapping
 // ======================================================
 
 function showData(data) {
@@ -410,13 +297,11 @@ function showData(data) {
   const start = new Date(data.start);
   const end = new Date(data.end);
 
-  // Ort anzeigen
   const locationEl = document.getElementById("locationDisplay");
   if (locationEl) {
     locationEl.textContent = data.location || "—";
   }
 
-  // Datum & Zeit zusammen auf einer Zeile anzeigen
   const dateTimeEl = document.getElementById("dateTimeDisplay");
   if (dateTimeEl) {
     const formattedDate = start.toLocaleDateString("de-DE", { day: "2-digit", month: "2-digit", year: "numeric" });
@@ -449,35 +334,38 @@ function showData(data) {
     speciesEl.innerHTML = `<span class="${recognized === speciesList.length && speciesList.length > 0 ? "green" : "red"}">${recognized}</span>`;
   }
 
+  if (recognized === 0 && speciesList.length > 0) {
+      setStatus('Keine Art gefunden <span id="statusHelp" style="cursor:pointer; font-weight:bold; margin-left:4px;" title="Hinweis anzeigen">[?]</span>');
+      document.getElementById("statusHelp")?.addEventListener("click", () => {
+        alert('Keine Art gefunden: Häufige Ursache ist eine falsche Sprachauswahl bei "Unterarten extrahieren". Prüfe die Einstellung oder deaktiviere die ganze Unterarten-Option.');
+      });
+    } else {
+      setStatus("Daten erfolgreich extrahiert");
+    }
+
   const debug = document.getElementById("speciesDebug");
   if (debug) debug.textContent = JSON.stringify(speciesList, null, 2);
 }
 
 let speciesMap = null;
-async function loadSpeciesMap() {
+function loadSpeciesMap() {
   if (speciesMap) return speciesMap;
-  const text = await (await fetch(chrome.runtime.getURL("ebird_names_to_code.csv"))).text();
+
   speciesMap = {};
+  const text = typeof ebirdNamesCsvData !== "undefined" ? ebirdNamesCsvData : "";
+
   text.split(/\r?\n/).filter(line => line.trim() && !line.startsWith("DE;")).forEach(line => {
     const [de, en, fr, code] = line.split(";").map(v => v.trim());
     if (de) speciesMap[`de:${de}`] = code;
     if (en) speciesMap[`en:${en}`] = code;
     if (fr) speciesMap[`fr:${fr}`] = code;
   });
+
   return speciesMap;
 }
 
-let birdIdMap = null;
-async function loadBirdIdMap() {
-  if (birdIdMap) return birdIdMap;
-  try {
-    const response = await fetch("https://raw.githubusercontent.com/FlorianH27/ebird2ornitho/refs/heads/main/code_to_id.txt");
-    birdIdMap = JSON.parse((await response.text()).replace(/'/g, '"'));
-  } catch(error) {
-    console.error("Fehler beim Laden von code_to_id.txt", error);
-    birdIdMap = {};
-  }
-  return birdIdMap;
+function loadBirdIdMap() {
+  return typeof birdIdMap !== "undefined" ? birdIdMap : {};
 }
 
 function getEbirdLanguage() {
@@ -543,7 +431,6 @@ async function extractEbirdData() {
     showData(data);
     await setStorage({ ebirdData: data, speciesData: speciesWithCodes });
     updateOpenLocationButton();
-    setStatus("Daten erfolgreich extrahiert");
   } catch(error) {
     console.error("eBird Extraktion Fehler:", error);
     setStatus("Fehler beim Auslesen");
@@ -551,11 +438,11 @@ async function extractEbirdData() {
 }
 
 // ======================================================
-// Teil 6: Polygon / Point-in-Polygon Hilfsfunktionen
+// Teil 5: Polygon / Point-in-Polygon Hilfsfunktionen
 // ======================================================
 
 function isPointInPolygon(point, vs) {
-  const x = point[0], y = point[1]; // x = lon, y = lat
+  const x = point[0], y = point[1];
   let inside = false;
   for (let i = 0, j = vs.length - 1; i < vs.length; j = i++) {
     const xi = vs[i][0], yi = vs[i][1];
@@ -573,27 +460,12 @@ function isPointInCountry(lat, lon, countryData) {
   return countryData.polygons.some(polygon => isPointInPolygon([lon, lat], polygon));
 }
 
-let countryDataCache = null;
-async function loadCountryData() {
-  if (countryDataCache) return countryDataCache;
-  try {
-    const rawGithubUrl = "https://raw.githubusercontent.com/FlorianH27/ebird2ornitho/main/country_polygons.json";
-    const response = await fetch(rawGithubUrl);
-
-    if (!response.ok) {
-      throw new Error(`HTTP Error: ${response.status}`);
-    }
-
-    countryDataCache = await response.json();
-  } catch (e) {
-    console.error("Fehler beim Laden der Länder-Polygone von GitHub:", e);
-    countryDataCache = {};
-  }
-  return countryDataCache;
+function loadCountryData() {
+  return typeof countryDataCache !== "undefined" ? countryDataCache : {};
 }
 
 // ======================================================
-// Teil 7: Ornitho Actions & Visibility Guards
+// Teil 6: Ornitho Actions & Visibility Guards
 // ======================================================
 
 async function insertMetadata() {
@@ -603,15 +475,24 @@ async function insertMetadata() {
     const result = await chrome.tabs.sendMessage(tab.id, { action: "fillFromStorage" });
     setStatus(result?.success ? "Metadaten erfolgreich eingefügt" : "Metadaten einfügen fehlgeschlagen");
   } catch(error) {
-    setStatus("Fehler beim Einfügen");
+    const statusEl = document.getElementById("status");
+    if (statusEl?.textContent !== "Arten werden eingefügt...") {
+      setStatus("Fehler beim Einfügen der Metadaten");
+    }
   }
 }
 
 async function transferSpecies() {
   const filterCheckbox = document.getElementById("toggleEmptySpecies");
   if (filterCheckbox && filterCheckbox.checked) {
-    filterCheckbox.checked = false;
+    filterCheckbox.checked = false
     filterCheckbox.dispatchEvent(new Event("change"));
+  }
+
+  filterCheckbox.disabled = true;
+  const switchLabel = document.querySelector('.switch-label');
+  if (switchLabel) {
+    switchLabel.style.color = '#888888';
   }
 
   setStatus("Arten werden eingefügt...");
@@ -646,6 +527,12 @@ async function transferSpecies() {
   } catch(error) {
     setStatus("Arten einfügen fehlgeschlagen");
   }
+
+  filterCheckbox.disabled = false;
+  if (switchLabel) {
+    switchLabel.style.color = '#111111';
+  }
+
 }
 
 async function updateLinkButton(forcedUrl = null) {
@@ -685,8 +572,7 @@ async function updateTransferButton(forcedUrl = null) {
 
   try {
     let url = forcedUrl || (await chrome.tabs.query({ active: true, lastFocusedWindow: true }))[0]?.url || "";
-
-  if (!url || url.startsWith("chrome://") || url.startsWith("edge://") || url === "about:blank") {
+    if (!url || url.startsWith("chrome://") || url.startsWith("edge://") || url === "about:blank") {
       if (transferButton) transferButton.style.display = "none";
       if (emptySpeciesCard) emptySpeciesCard.style.display = "none";
       if (failedAtlasList) failedAtlasList.style.display = "none";
@@ -694,13 +580,15 @@ async function updateTransferButton(forcedUrl = null) {
       return;
     }
 
-    const isCurrentStateDaily = url.includes("index.php?m_id=1423&wizard_current_state=daily");
-    const displayStyle = isCurrentStateDaily ? "flex" : "none";
+    const isOldPattern = url.includes("index.php?m_id=1423&wizard_current_state=daily");
+    const isNewPattern = /wizard_id=\d+.*wizard_target=daily_list/.test(url);
+    const isValid = isOldPattern || isNewPattern;
+    const displayStyle = isValid ? "flex" : "none";
 
-    if (transferButton) transferButton.style.display = isCurrentStateDaily ? "block" : "none";
+    if (transferButton) transferButton.style.display = isValid ? "block" : "none";
     if (emptySpeciesCard) emptySpeciesCard.style.display = displayStyle;
 
-    if (!isCurrentStateDaily) {
+    if (!isValid) {
       if (failedAtlasList) failedAtlasList.style.display = "none";
       if (failedSpeciesList) failedSpeciesList.style.display = "none";
     }
@@ -745,10 +633,8 @@ async function updateOpenLocationButton() {
   const hasLink = ebirdData?.location && locationLinks[ebirdData.location];
   const hasCoordinates = !!ebirdData?.coordinates?.lat && !!ebirdData?.coordinates?.lon;
 
-  // 1. Unveränderte Logik für Verknüpfungs-Button
   if (openButton) openButton.style.display = hasLink ? "flex" : "none";
 
-  // 2. Dynamische Erzeugung der Karten-Buttons nach Ländern
   if (mapBtnContainer) {
     mapBtnContainer.innerHTML = "";
 
@@ -766,8 +652,7 @@ async function updateOpenLocationButton() {
         const btn = document.createElement("button");
         btn.className = "ornitho-map-btn";
 
-        // Domain aus der URL extrahieren (z. B. "https://www.ornitho.ch/..." -> "ornitho.ch")
-        let domain = code; // Fallback auf Länderkürzel
+        let domain = code;
         try {
           domain = new URL(countryInfo.url).hostname.replace(/^www\./, '');
         } catch (e) {
@@ -775,8 +660,6 @@ async function updateOpenLocationButton() {
         }
 
         btn.title = `Karte in ${domain} öffnen`;
-
-        // Nur das Länderkürzel als Text setzen
         btn.textContent = code;
 
         btn.addEventListener("click", () => {
@@ -814,9 +697,9 @@ async function openLocation() {
   });
 }
 
-async function getAtlasMap(country) {
+function getAtlasMap(country) {
   try {
-    const text = await (await fetch(chrome.runtime.getURL("breedingcode.csv"))).text();
+    const text = typeof breedingCodeCsvData !== "undefined" ? breedingCodeCsvData : "";
     const lines = text.split(/\r?\n/).filter(line => line.trim());
     if (!lines.length) return {};
 
@@ -848,6 +731,22 @@ function initSpeciesFilter() {
   });
 }
 
+document.querySelectorAll(".help-circle-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    const targetId = btn.getAttribute("data-target");
+    const descBox = document.getElementById(targetId);
+    if (!descBox) return;
+
+    const isVisible = descBox.style.display === "block";
+
+    document.querySelectorAll(".settings-desc-box").forEach(box => {
+      box.style.display = "none";
+    });
+
+    descBox.style.display = isVisible ? "none" : "block";
+  });
+});
+
 function initActionButtons() {
   document.getElementById("extractBtn")?.addEventListener("click", extractEbirdData);
   document.getElementById("insertBtn")?.addEventListener("click", insertMetadata);
@@ -857,7 +756,7 @@ function initActionButtons() {
 }
 
 // ======================================================
-// Teil 8: Initialisierung & Main Loop
+// Teil 7: Initialisierung & Main Loop
 // ======================================================
 
 async function init() {
@@ -873,7 +772,6 @@ async function init() {
   hideOpenLocationButton();
   await clearEbirdSessionData();
 
-  // Settings & Storage Syncing
   initSettingsMenu();
   await initStrassentaubeSetting();
   await inituseAtlasCodesCTSetting();
@@ -882,7 +780,6 @@ async function init() {
   initBreedingSetting();
   initCommentsSetting();
 
-  // UI Functionalities
   initActionButtons();
   initSpeciesFilter();
 
@@ -890,23 +787,16 @@ async function init() {
   if (card) card.style.display = "none";
   document.getElementById("transferSpeciesBtn")?.addEventListener("click", () => { if (card) card.style.display = "flex"; });
 
-  // Messaging Map Listener
   chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-    if (message.action === "getAtlasMap" && message.country) {
-      getAtlasMap(message.country).then(sendResponse);
-      return true;
-    }
-  });
+  if (message.action === "getAtlasMap" && message.country) {
+    const result = getAtlasMap(message.country);
+    sendResponse(result);
+  }
+});
 
-  // Initiale URL Checks
   updateLinkButton();
   updateTransferButton();
 
-// ------------------------------------------------------
-  // Tab-Wechsel & URL-Änderungen (Ohne 'tabs'-Berechtigung)
-  // ------------------------------------------------------
-
-  // Hilfsfunktion, die immer den aktuellen Tab im aktiven Fenster abfragt
   async function refreshActiveTabState() {
     try {
       const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
@@ -919,15 +809,11 @@ async function init() {
     }
   }
 
-  // Wenn der Nutzer den Tab wechselt
   chrome.tabs.onActivated.addListener(async () => {
-    // Kurze Verzögerung, damit Chrome den Tab-Wechsel vollständig abgeschlossen hat
     setTimeout(refreshActiveTabState, 50);
   });
 
-  // Wenn sich die URL im aktuellen Tab ändert (z.B. Navigation)
   chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-    // Wir prüfen nur, ob der aktualisierte Tab auch wirklich der aktive ist
     if (tab.active && (changeInfo.url || changeInfo.status === "complete")) {
       if (tab.url) {
         updateLinkButton(tab.url);
@@ -936,16 +822,11 @@ async function init() {
     }
   });
 
-  // Wenn das Browserfenster den Fokus wechselt
   chrome.windows.onFocusChanged.addListener((windowId) => {
     if (windowId !== chrome.windows.WINDOW_ID_NONE) {
       refreshActiveTabState();
     }
   });
-
-
-  checkUpdate();
-
 }
 
 if (document.readyState === "loading") {
@@ -955,16 +836,14 @@ if (document.readyState === "loading") {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-  // --- Footer Zoom-Logik (+ / -) ---
   const zoomInBtn = document.getElementById('zoomInBtn');
   const zoomOutBtn = document.getElementById('zoomOutBtn');
 
-  // Verfügbare Zoom-Stufen
   const zoomSteps = [0.8, 0.9, 1.0, 1.1, 1.25];
 
   function getCurrentZoomIndex(currentVal) {
     const num = parseFloat(currentVal);
-    let closestIdx = 2; // Standard 1.0
+    let closestIdx = 2;
     let minDiff = Infinity;
     zoomSteps.forEach((step, idx) => {
       const diff = Math.abs(step - num);
@@ -977,13 +856,11 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function applyZoom(val) {
-    // Auf 2 Nachkommastellen begrenzen, um Fließkomma-Fehler zu vermeiden
     const roundedVal = Math.round(val * 100) / 100;
     document.documentElement.style.setProperty('--zoom-factor', roundedVal);
     localStorage.setItem('panelZoom', roundedVal);
   }
 
-  // Gespeicherten Zoom laden
   const savedZoom = localStorage.getItem('panelZoom');
   if (savedZoom) {
     applyZoom(savedZoom);
@@ -1010,6 +887,4 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
   }
-
-  // --- Dein restlicher Code für das Side Panel ---
 });
